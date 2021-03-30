@@ -5,7 +5,7 @@
 import base_test_pkg::*;
 import test_case_00_pkg::*;
 
-module tb_07_step1
+module tb_07_step3
 #(
     parameter  MAX_TIME = 8000
 );
@@ -64,7 +64,7 @@ end
 assign fifo_0_overflow = credit_07_dut.fifo_w4_overflow;
 assign fifo_1_overflow = credit_07_dut.fifo_out_overfow;
 
- credit_07_step1 
+ credit_07_step3
  credit_07_dut 
  (
     .reset_p            (   reset_p         ),

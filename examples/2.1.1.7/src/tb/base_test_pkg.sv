@@ -126,7 +126,7 @@ function void create_expect_data();
         for( jj=0; jj<cnt; jj++ ) begin
             val_b = get_ram1( addr_b );
             test_expect[index].data = val_b;
-            test_expect[index].delay = 0;
+            test_expect[index].delay = 1;
             addr_b++;
             index++;
         end

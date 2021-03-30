@@ -60,6 +60,14 @@ function init_mode2;
     test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;    
     test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;    
     test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;    
+    test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;
+    test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;    
+    test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;    
+    test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;    
+    test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;
+    test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;    
+    test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;    
+    test_input[ii].addr = 8'h10; test_input[ii].delay = 16;  ii++;    
 
     max_test_input=ii;
 

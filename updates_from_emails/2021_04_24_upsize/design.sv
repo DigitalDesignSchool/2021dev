@@ -1,6 +1,6 @@
 module upsizing
   #(
-    parameter W = 5
+    parameter W = 40
   )
   (
     input aclk,
@@ -36,39 +36,6 @@ module upsizing
           out_tdata [W * 2 - 1:W] <= in_tdata;
       end
 
-  /*
-
-  This is correct but less clear than the next one:
-
-  always @(posedge aclk or negedge aresetn)
-    if (! aresetn)
-      out_tvalid <= 1'b0;
-    else if (in_tready)
-      out_tvalid <= in_tvalid & lower_bits;
-  */
-
-  // 16 cases:
-  //
-  // in_valid=0 out_ready=0 lower_bits=0 out_valid=0 -> out_valid=0
-  // in_valid=0 out_ready=0 lower_bits=0 out_valid=1 -> out_valid=1
-  // in_valid=0 out_ready=0 lower_bits=1 out_valid=0 -> out_valid=0
-  // in_valid=0 out_ready=0 lower_bits=1 out_valid=1 -> impossible
-  //
-  // in_valid=0 out_ready=1 lower_bits=0 out_valid=0 -> out_valid=0
-  // in_valid=0 out_ready=1 lower_bits=0 out_valid=1 -> out_valid=0 remove valid
-  // in_valid=0 out_ready=1 lower_bits=1 out_valid=0 -> out_valid=0
-  // in_valid=0 out_ready=1 lower_bits=1 out_valid=1 -> impossible
-  //
-  // in_valid=1 out_ready=0 lower_bits=0 out_valid=0 -> out_valid=0
-  // in_valid=1 out_ready=0 lower_bits=0 out_valid=1 -> out_valid=1
-  // in_valid=1 out_ready=0 lower_bits=1 out_valid=0 -> out_valid=1 fill right
-  // in_valid=1 out_ready=0 lower_bits=1 out_valid=1 -> impossible
-  //
-  // in_valid=1 out_ready=1 lower_bits=0 out_valid=0 -> out_valid=0
-  // in_valid=1 out_ready=1 lower_bits=0 out_valid=1 -> out_valid=0 fill left, remove valid
-  // in_valid=1 out_ready=1 lower_bits=1 out_valid=0 -> out_valid=1 fill right
-  // in_valid=1 out_ready=1 lower_bits=1 out_valid=1 -> impossible
-  
   always @(posedge aclk or negedge aresetn)
     if (! aresetn)
       out_tvalid <= '0;
@@ -88,5 +55,116 @@ module upsizing
   // 2. if we have a space, i.e. lower_bits == 1
   
   assign in_tready = out_tready | lower_bits;
- 
+
+  // Functional coverage
+
+  `ifdef VCS
+      
+  wire [3:0] all_cases
+      = { in_tvalid, lower_bits, out_tvalid, out_tready };
+      
+  covergroup cvr @ (posedge aclk iff aresetn);
+    option.per_instance = 1;
+    
+    // First we check that every signal was toggled
+
+    coverpoint in_tvalid
+    {
+      bins ivld    = { 1 };
+      bins no_ivld = { 0 };
+    }
+
+    coverpoint_without_bins_for_illustration: coverpoint in_tvalid;
+    
+    coverpoint in_tready
+    {
+      bins irdy    = { 1 };
+      bins no_irdy = { 0 };
+    }
+    
+    coverpoint out_tvalid
+    {
+      bins ovld    = { 1 };
+      bins no_ovld = { 0 };
+    }
+    
+    coverpoint out_tready
+    {
+      bins ordy    = { 1 };
+      bins no_ordy = { 0 };
+    }
+    
+    coverpoint lower_bits
+    {
+      bins lower = { 1 };
+      bins upper = { 0 };
+    }
+    
+    // Crosses
+
+    i_vld_rdy: cross in_tvalid,  in_tready;
+    o_vld_rdy: cross out_tvalid, out_tready;
+
+    // There is a coverage hole here. Can you find?
+    
+    i_vld_rdy_lower_upper: cross i_vld_rdy, lower_bits;
+
+    o_vld_rdy_lower_upper: cross out_tvalid, out_tready, lower_bits
+    {
+      illegal_bins illegal
+        =    binsof (lower_bits) intersect { 1 }
+          && binsof (out_tvalid) intersect { 1 };
+    }
+
+    in_tdata_auto: coverpoint in_tdata;
+
+    in_tdata_fancy: coverpoint in_tdata
+      iff (in_tvalid & in_tready)
+    {
+      bins          ABCDE                       = {   40'h4142434445 };
+      bins          ABCDE_or_PQRST              = {   40'h4142434445 , 40'h5051525354   };
+      bins          from_ABCDE_till_PQRST       = { [ 40'h4142434445 : 40'h5051525354 ] };
+      bins          from_ABCDE_till_PQRST_3 [3] = { [ 40'h4142434445 : 40'h5051525354 ] };
+      illegal_bins  AABCD                       = {   40'h4141424344 };
+    }
+
+    out_tdata_wild: coverpoint out_tdata
+      iff (out_tvalid & out_tready)
+    {
+      wildcard bins all_4X          = { 80'h4?4?4?4?4?_4?4?4?4?4? };
+      wildcard bins five_4X_five_5X = { 80'h4?4?4?4?4?_5?5?5?5?5? };
+      wildcard bins four_4X_six_5X  = { 80'h4?4?4?4?5?_5?5?5?5?5? };
+      wildcard bins end_with_4      = { 80'h??????????_?????????4 };
+      wildcard bins end_with_hexA   = { 80'h??????????_?????????A };
+    }
+    
+    
+  // 16 cases:
+  //
+  // in_valid=0 out_ready=0 lower_bits=0 out_valid=0 -> out_valid=0
+  // in_valid=0 out_ready=0 lower_bits=0 out_valid=1 -> out_valid=1
+  // in_valid=0 out_ready=0 lower_bits=1 out_valid=0 -> out_valid=0
+  // in_valid=0 out_ready=0 lower_bits=1 out_valid=1 -> impossible
+  //
+  // in_valid=0 out_ready=1 lower_bits=0 out_valid=0 -> out_valid=0
+  // in_valid=0 out_ready=1 lower_bits=0 out_valid=1 -> out_valid=0 remove valid
+  // in_valid=0 out_ready=1 lower_bits=1 out_valid=0 -> out_valid=0
+  // in_valid=0 out_ready=1 lower_bits=1 out_valid=1 -> impossible
+  //
+  // in_valid=1 out_ready=0 lower_bits=0 out_valid=0 -> out_valid=0 
+  // in_valid=1 out_ready=0 lower_bits=0 out_valid=1 -> out_valid=1
+  // in_valid=1 out_ready=0 lower_bits=1 out_valid=0 -> out_valid=1 fill right
+  // in_valid=1 out_ready=0 lower_bits=1 out_valid=1 -> impossible
+  //
+  // in_valid=1 out_ready=1 lower_bits=0 out_valid=0 -> out_valid=0
+  // in_valid=1 out_ready=1 lower_bits=0 out_valid=1 -> out_valid=0 fill left, remove valid
+  // in_valid=1 out_ready=1 lower_bits=1 out_valid=0 -> out_valid=1 fill right
+  // in_valid=1 out_ready=1 lower_bits=1 out_valid=1 -> impossible
+
+  endgroup
+      
+  cvr cg = new ();
+      
+  `endif
+
 endmodule

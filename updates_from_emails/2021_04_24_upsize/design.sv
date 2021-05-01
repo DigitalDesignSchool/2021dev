@@ -1,3 +1,5 @@
+`include "defines.svh"
+
 module upsizing
   #(
     parameter W = 40
@@ -58,15 +60,8 @@ module upsizing
 
   // Functional coverage
 
-  `ifdef VCS         // Synopsys
-  `elsif INCA        // Cadence
-  `elsif QUESTA      // Mentor
-  `elsif MODEL_TECH  // Mentor
-  `else
-  `define NO_COVERAGE
-  `endif
-      
-  `ifndef NO_COVERAGE
+        
+  `ifdef COVERAGE
       
   wire [3:0] all_cases
       = { in_tvalid, lower_bits, out_tvalid, out_tready };

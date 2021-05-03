@@ -198,7 +198,7 @@ module testbench;
   //--------------------------------------------------------------------------
   
   int cycle = 0;
-
+  
   always @ (posedge clk)
     begin
       $write ("%d %s in vld=%b rdy=%b",
@@ -206,23 +206,23 @@ module testbench;
         rst ? "rst" : "   ",
         in_tvalid,
         in_tready);
-
+      
       $write (" %s", in_tdata);
-
+      
       if (in_tvalid)
         $write (" %s", in_tdata);
       else
         $write ("      ");
-
+      
       if (in_tvalid & in_tready)
         $write (" %s", in_tdata);
       else
         $write ("      ");
-
+      
       $write (" out vld=%b rdy=%b",
         out_tvalid,
         out_tready);
-
+      
       if (dut.lower_bits)
         $write (" %s.....", out_tdata [W * 2 - 1:W]);
       else
@@ -247,8 +247,8 @@ module testbench;
   
   //--------------------------------------------------------------------------
 
-  reg  [W - 1:0] queue [$];
-  reg  [2 * W - 1:0] out_data_expected;
+  logic [W     - 1:0] queue [$];
+  logic [2 * W - 1:0] out_data_expected;
 
   always @ (posedge clk)
     begin
@@ -257,18 +257,19 @@ module testbench;
 
       if (out_tvalid & out_tready)
         if (queue.size () == 0)
-          $fatal ("unexpected output data: unexpected output data: nothing in flight");
+          $fatal ("unexpected output data: nothing in flight");
         else if (queue.size () == 1)
-          $fatal ("unexpected output data: unexpected output data: only 1 in_data is in flight");
+          $fatal ("unexpected output data: only 1 in_data is in flight");
         else
         begin
           out_data_expected [2 * W - 1:W] = queue.pop_front ();
           out_data_expected [    W - 1:0] = queue.pop_front ();
 
           if (out_data_expected != out_tdata)
-            $fatal ("data does not match: data=%h expected_data=%h", out_tdata, out_data_expected);
+            $fatal ("data does not match: data=%s expected_data=%s",
+              out_tdata, out_data_expected);
           else
-            $display ("monitor: data does match: %h", out_tdata);
+            $display ("monitor: out_tdata matches: %s", out_tdata);
         end
     end
 

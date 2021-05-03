@@ -196,9 +196,9 @@ module testbench;
   endtask
     
   //--------------------------------------------------------------------------
-  
+
   int cycle = 0;
-  
+
   always @ (posedge clk)
     begin
       $write ("%d %s in vld=%b rdy=%b",
@@ -206,23 +206,23 @@ module testbench;
         rst ? "rst" : "   ",
         in_tvalid,
         in_tready);
-      
+
       $write (" %s", in_tdata);
-      
+
       if (in_tvalid)
         $write (" %s", in_tdata);
       else
         $write ("      ");
-      
+
       if (in_tvalid & in_tready)
         $write (" %s", in_tdata);
       else
         $write ("      ");
-      
+
       $write (" out vld=%b rdy=%b",
         out_tvalid,
         out_tready);
-      
+
       if (dut.lower_bits)
         $write (" %s.....", out_tdata [W * 2 - 1:W]);
       else
@@ -234,17 +234,17 @@ module testbench;
         $write (" %s.....", out_tdata [W * 2 - 1:W]);
       else
         $write (" %s", out_tdata);
-      
+
       if (out_tvalid & out_tready)
         $write (" %s", out_tdata);
       else
         $write ("           ");
-      
+
       $display;
-      
+
       cycle ++;
     end
-  
+
   //--------------------------------------------------------------------------
 
   logic [W     - 1:0] queue [$];

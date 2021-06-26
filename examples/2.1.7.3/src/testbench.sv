@@ -81,6 +81,10 @@ initial begin
     test_finish( test_id, test_name[test_id], 0 );  // test failed
 end
   
+initial begin
+  $dumpfile("dump.vcd");
+  $dumpvars(1);
+end
 always #5 aclk = ~aclk;
   
 gearbox_upsizing_2x   uut
@@ -109,6 +113,31 @@ begin
 
 end endtask
 
+
+task write_seq;
+begin
+  automatic logic [7:0]  data_out=8'h41;
+  automatic logic [nb-1:0]  val;
+  automatic int pause;
+
+  for( int jj=0; jj<100; jj++ ) begin
+
+    pause = $urandom_range( 0, 3 );
+
+    for( int ii=0; ii<n; ii++ ) begin
+      val[ii*8+:8] = data_out;
+      data_out++;
+      if( 8'h5B==data_out )
+        data_out=8'h41;
+
+    end
+    write_data( val, pause );
+  end 
+
+  test_done=1;
+
+end endtask
+
 task set_outready_cnt;
       input int cnt;
 begin
@@ -117,16 +146,47 @@ begin
 
 end endtask
 
+task gen_out_tready;
+begin
+
+  automatic int cnt_high;
+  automatic int cnt_low;
+  while(1) begin
+
+    cnt_high = $urandom_range( 1, 6 );
+    cnt_low  = $urandom_range( 1, 6 );
+
+    @(posedge aclk iff out_tready);
+
+    if( test_done )
+      break;
+
+    if( cnt_high ) begin
+        repeat(cnt_high) @(posedge aclk);
+    end
+    set_outready_cnt( cnt_low );
+
+  end
+  
+end endtask
+
+always @(posedge aclk)
+  if( out_ready_cnt>0 ) begin
+      out_ready_cnt--;
+      if( 0==out_ready_cnt )
+        out_tready <= #1 '1;
+  end
+
 generate
   case( test_id)
     0: begin
 
-        always @(posedge aclk)
-          if( out_ready_cnt>0 ) begin
-              out_ready_cnt--;
-              if( 0==out_ready_cnt )
-                out_tready <= #1 '1;
-          end
+        // always @(posedge aclk)
+        //   if( out_ready_cnt>0 ) begin
+        //       out_ready_cnt--;
+        //       if( 0==out_ready_cnt )
+        //         out_tready <= #1 '1;
+        //   end
 
         initial begin
 
@@ -163,7 +223,14 @@ generate
     end
 
     1: begin
-
+        initial begin
+            #500;
+            fork 
+              write_seq();
+              gen_out_tready();
+            join
+            #500;
+        end
     end
   endcase
 endgenerate

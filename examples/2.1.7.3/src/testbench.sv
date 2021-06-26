@@ -29,7 +29,7 @@ begin
     $display( "test_id=%-5d test_name: %15s         TEST_FAILED *******", test_id, test_name );
   end
   
-  $finish();
+  $stop();
 end endtask  
   
 localparam  n = 5, nb = n * 8;
@@ -53,33 +53,6 @@ int                 cnt_error=0;
 logic               test_done=0;
 int                 out_ready_cnt=0;
 
-initial begin  
-//   int fd = $fopen("test_id.txt", "r");
-//   $fscanf( fd,"%d\n",test_id);
-//   $fclose(fd );
-  $display("Test gearbox_upsizing_2x test_id=%d  name:", test_id, test_name[test_id] );
-  
-  aresetn = '0;
-
-  #100;
-
-  aresetn = '1;
-
-  @(posedge aclk iff test_done=='1);
-
-  if( cnt_wr != cnt_rd*2 )
-    cnt_error++;
-
-  $display( "cnt_wr: %d", cnt_wr );
-  $display( "cnt_rd: %d", cnt_rd );
-  $display( "cnt_ok: %d", cnt_ok );
-  $display( "cnt_error: %d", cnt_error );
-
-  if( 0==cnt_error && cnt_ok>0 )
-    test_finish( test_id, test_name[test_id], 1 );  // test passed
-  else
-    test_finish( test_id, test_name[test_id], 0 );  // test failed
-end
   
 initial begin
   $dumpfile("dump.vcd");
@@ -120,19 +93,23 @@ begin
   automatic logic [nb-1:0]  val;
   automatic int pause;
 
-  for( int jj=0; jj<100; jj++ ) begin
+  while(1) begin
+    for( int jj=0; jj<100; jj++ ) begin
 
-    pause = $urandom_range( 0, 3 );
+      pause = $urandom_range( 0, 3 );
 
-    for( int ii=0; ii<n; ii++ ) begin
-      val[ii*8+:8] = data_out;
-      data_out++;
-      if( 8'h5B==data_out )
-        data_out=8'h41;
+      for( int ii=0; ii<n; ii++ ) begin
+        val[ii*8+:8] = data_out;
+        data_out++;
+        if( 8'h5B==data_out )
+          data_out=8'h41;
 
-    end
-    write_data( val, pause );
-  end 
+      end
+      write_data( val, pause );
+    end 
+    if( 100==$get_coverage())
+      break;
+  end
 
   test_done=1;
 
@@ -153,7 +130,7 @@ begin
   automatic int cnt_low;
   while(1) begin
 
-    cnt_high = $urandom_range( 1, 6 );
+    cnt_high = $urandom_range( 0, 6 );
     cnt_low  = $urandom_range( 1, 6 );
 
     @(posedge aclk iff out_tready);
@@ -268,7 +245,97 @@ always @(posedge aclk)
     cnt_rd++;
   end
 
+
+// covergroup cvr ( aclk=0, aresetn=0, in_tvalid=0, in_tready=0, out_tvalid=0, out_tready=0, flag_hf=0) @ (posedge aclk iff aresetn);
+//     option.comment      = "Comment for the report: upsizing covergroup";
+//     option.per_instance = 1;
+
+//     // First we check that every signal was toggled
+
+//     coverpoint in_tvalid
+//     {
+//       bins ivld    = { 1 };
+//       bins no_ivld = { 0 };
+//     }
+
+//     coverpoint in_tready
+//     {
+//       bins irdy    = { 1 };
+//       bins no_irdy = { 0 };
+//     }
+    
+//     coverpoint out_tvalid
+//     {
+//       bins ovld    = { 1 };
+//       bins no_ovld = { 0 };
+//     }
+    
+//     coverpoint out_tready
+//     {
+//       bins ordy    = { 1 };
+//       bins no_ordy = { 0 };
+//     }
+
+//     coverpoint flag_hf
+//     {
+//       bins lower = { 1 };
+//       bins upper = { 0 };
+//     }
+
+// endgroup
+      
+// cvr cg = new ();    
+
+// bind tb.uut cg cg(.*);
+
+initial begin  
+//   int fd = $fopen("test_id.txt", "r");
+//   $fscanf( fd,"%d\n",test_id);
+//   $fclose(fd );
+  $display("Test gearbox_upsizing_2x test_id=%d  name:", test_id, test_name[test_id] );
+  
+  aresetn = '0;
+
+  #100;
+
+  aresetn = '1;
+
+  @(posedge aclk iff test_done=='1);
+
+  if( cnt_wr != cnt_rd*2 )
+    cnt_error++;
+
+  $display( "cnt_wr: %d", cnt_wr );
+  $display( "cnt_rd: %d", cnt_rd );
+  $display( "cnt_ok: %d", cnt_ok );
+  $display( "cnt_error: %d", cnt_error );
+
+
+  $display("overall coverage = %0f", $get_coverage());
+  $display("coverage of covergroup cg = %0f", uut.cg.get_coverage());
+  $display("coverage of covergroup cg.in_tready = %0f", uut.cg.in_tready.get_coverage());
+  $display("coverage of covergroup cg.in_tvalid = %0f", uut.cg.in_tvalid.get_coverage());
+  $display("coverage of covergroup cg.out_tready = %0f", uut.cg.out_tready.get_coverage());
+  $display("coverage of covergroup cg.out_tvalid = %0f", uut.cg.out_tvalid.get_coverage());
+  $display("coverage of covergroup cg.flag_hf = %0f", uut.cg.flag_hf.get_coverage());
+  
+  $display("coverage of covergroup cg.i_vld_rdy = %0f", uut.cg.i_vld_rdy.get_coverage());
+  $display("coverage of covergroup cg.o_vld_rdy = %0f", uut.cg.o_vld_rdy.get_coverage());
+
+  $display("coverage of covergroup cg.o_rdy_transitions = %0f", uut.cg.o_rdy_transitions.get_coverage());
+  
+
+  if( 0==cnt_error && cnt_ok>0 )
+    test_finish( test_id, test_name[test_id], 1 );  // test passed
+  else
+    test_finish( test_id, test_name[test_id], 0 );  // test failed
+
+
+
+end
+
 endmodule
+
 
 
 `default_nettype wire

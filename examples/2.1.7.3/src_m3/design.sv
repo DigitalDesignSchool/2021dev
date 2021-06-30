@@ -6,16 +6,16 @@ module upsizing
     parameter W = 40
   )
   (
-    input aclk,
-    input aresetn,
+    input wire aclk,
+    input wire aresetn,
 
-    input      [W     - 1:0] in_tdata,
-    input                    in_tvalid,
-    output                   in_tready,
+    input wire     [W     - 1:0] in_tdata,
+    input wire                   in_tvalid,
+    output wire                  in_tready,
   
     output reg [W * 2 - 1:0] out_tdata,
     output reg               out_tvalid,
-    input                    out_tready
+    input  wire                  out_tready
   );
   
   reg lower_bits;
@@ -24,8 +24,8 @@ module upsizing
   // if and only if the input transfer is accepted,
   // i.e. in_tvalid & in_tready
   
-  always @(posedge aclk or negedge aresetn)
-    if (! aresetn)
+  always @(posedge aclk )
+    if (!aresetn)
       lower_bits <= '0;
     else if (in_tvalid & in_tready)
       lower_bits <= ~ lower_bits;

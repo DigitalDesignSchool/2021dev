@@ -59,6 +59,9 @@ logic 				flag_hf;
   
 assign flag_hf = uut.flag_hf;
 
+logic last_part;
+
+//assign last_part = uut.last_part;
 
 initial begin
   $dumpfile("dump.vcd");
@@ -70,6 +73,16 @@ gearbox_downsizing_2x   uut
 (
           .*
 );
+
+//downsizing
+// #(
+//     .W(   40  )
+// )
+//    uut
+// (
+//           .*
+// );
+
 
 task write_data;
     input logic [nb*2 - 1:0]    data;
@@ -103,7 +116,7 @@ end endtask
 task write_seq;
 begin
   automatic logic [7:0]  data_out=8'h41;
-  automatic logic [nb-1:0]  val;
+  automatic logic [nb*2-1:0]  val;
   automatic int pause;
 
   //while(1) begin
@@ -317,18 +330,18 @@ initial begin
   $display( "cnt_error: %d", cnt_error );
 
 
-  $display("overall coverage = %0f", $get_coverage());
-  $display("coverage of covergroup cg = %0f", uut.cg.get_coverage());
-  $display("coverage of covergroup cg.in_tready = %0f", uut.cg.in_tready.get_coverage());
-  $display("coverage of covergroup cg.in_tvalid = %0f", uut.cg.in_tvalid.get_coverage());
-  $display("coverage of covergroup cg.out_tready = %0f", uut.cg.out_tready.get_coverage());
-  $display("coverage of covergroup cg.out_tvalid = %0f", uut.cg.out_tvalid.get_coverage());
-  $display("coverage of covergroup cg.flag_hf = %0f", uut.cg.flag_hf.get_coverage());
+  // $display("overall coverage = %0f", $get_coverage());
+  // $display("coverage of covergroup cg = %0f", uut.cg.get_coverage());
+  // $display("coverage of covergroup cg.in_tready = %0f", uut.cg.in_tready.get_coverage());
+  // $display("coverage of covergroup cg.in_tvalid = %0f", uut.cg.in_tvalid.get_coverage());
+  // $display("coverage of covergroup cg.out_tready = %0f", uut.cg.out_tready.get_coverage());
+  // $display("coverage of covergroup cg.out_tvalid = %0f", uut.cg.out_tvalid.get_coverage());
+  // $display("coverage of covergroup cg.flag_hf = %0f", uut.cg.flag_hf.get_coverage());
   
-  $display("coverage of covergroup cg.i_vld_rdy = %0f", uut.cg.i_vld_rdy.get_coverage());
-  $display("coverage of covergroup cg.o_vld_rdy = %0f", uut.cg.o_vld_rdy.get_coverage());
+  // $display("coverage of covergroup cg.i_vld_rdy = %0f", uut.cg.i_vld_rdy.get_coverage());
+  // $display("coverage of covergroup cg.o_vld_rdy = %0f", uut.cg.o_vld_rdy.get_coverage());
 
-  $display("coverage of covergroup cg.o_rdy_transitions = %0f", uut.cg.o_rdy_transitions.get_coverage());
+  // $display("coverage of covergroup cg.o_rdy_transitions = %0f", uut.cg.o_rdy_transitions.get_coverage());
   
 
   if( 0==cnt_error && cnt_ok>0 )

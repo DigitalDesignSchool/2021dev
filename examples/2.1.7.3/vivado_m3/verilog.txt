@@ -1,0 +1,3 @@
+../src_m3/design.sv
+../src_m3/binding_coverage_upsizing.sv
+../src_m3/testbench.sv

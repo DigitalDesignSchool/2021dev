@@ -1,5 +1,4 @@
 // Code your design here
-
 `default_nettype none 
 
 module gearbox_downsizing_2x

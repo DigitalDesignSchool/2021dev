@@ -14,10 +14,12 @@ module  binding_coverage_upsizing
   
     input reg [W * 2 - 1:0] out_tdata,
     input reg               out_tvalid,
-    input                    out_tready
+    input                    out_tready,
+
+    input                    lower_bits
   );
   
-  reg lower_bits;
+  
   
   `ifdef COVERAGE
 

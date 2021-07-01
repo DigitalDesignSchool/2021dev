@@ -59,7 +59,12 @@ initial begin
 end
 always #5 aclk = ~aclk;
   
-gearbox_upsizing_2x   uut
+bind upsizing   binding_coverage_upsizing #(W)   uut(.*); 
+
+upsizing
+#( 
+    .W        (   nb  )
+)   uut
 (
           .*
 );
@@ -311,17 +316,17 @@ initial begin
 
 
   $display("overall coverage = %0f", $get_coverage());
-  $display("coverage of covergroup cg = %0f", uut.cg.get_coverage());
-  $display("coverage of covergroup cg.in_tready = %0f", uut.cg.in_tready.get_coverage());
-  $display("coverage of covergroup cg.in_tvalid = %0f", uut.cg.in_tvalid.get_coverage());
-  $display("coverage of covergroup cg.out_tready = %0f", uut.cg.out_tready.get_coverage());
-  $display("coverage of covergroup cg.out_tvalid = %0f", uut.cg.out_tvalid.get_coverage());
-  $display("coverage of covergroup cg.flag_hf = %0f", uut.cg.flag_hf.get_coverage());
+  $display("coverage of covergroup cg = %0f", uut.uut.cg.get_coverage());
+  $display("coverage of covergroup cg.in_tready = %0f", uut.uut.cg.in_tready.get_coverage());
+  $display("coverage of covergroup cg.in_tvalid = %0f", uut.uut.cg.in_tvalid.get_coverage());
+  $display("coverage of covergroup cg.out_tready = %0f", uut.uut.cg.out_tready.get_coverage());
+  $display("coverage of covergroup cg.out_tvalid = %0f", uut.uut.cg.out_tvalid.get_coverage());
+  //$display("coverage of covergroup cg.flag_hf = %0f", uut.uut.cg.flag_hf.get_coverage());
   
-  $display("coverage of covergroup cg.i_vld_rdy = %0f", uut.cg.i_vld_rdy.get_coverage());
-  $display("coverage of covergroup cg.o_vld_rdy = %0f", uut.cg.o_vld_rdy.get_coverage());
+  //$display("coverage of covergroup cg.i_vld_rdy = %0f", uut.uut.cg.i_vld_rdy.get_coverage());
+  $display("coverage of covergroup cg.o_vld_rdy = %0f", uut.uut.cg.o_vld_rdy.get_coverage());
 
-  $display("coverage of covergroup cg.o_rdy_transitions = %0f", uut.cg.o_rdy_transitions.get_coverage());
+  $display("coverage of covergroup cg.o_rdy_transitions = %0f", uut.uut.cg.o_rdy_transitions.get_coverage());
   
 
   if( 0==cnt_error && cnt_ok>0 )

@@ -31,12 +31,14 @@ begin
   $stop();
 end endtask  
   
-localparam  n = 5, nb = n * 8;
+localparam  n = 10, nb = n * 8;
+localparam  maxkeep = 2**n;
 
 logic              aclk=0;
 logic              aresetn;
 
-logic [nb*2 - 1:0]   in_tdata='0;
+logic [nb - 1:0]   in_tdata='0;
+logic [n-1:0]      in_tkeep='0;
 logic              in_tvalid='0;
 logic              in_tready;
 
@@ -72,7 +74,11 @@ initial begin
 end
 always #5 aclk = ~aclk;
   
-gearbox_packing   uut
+gearbox_packing  
+#(
+  .n    ( n )
+)
+ uut
 (
           .*
 );
@@ -88,27 +94,28 @@ gearbox_packing   uut
 
 
 task write_data;
-    input logic [nb*2 - 1:0]    data;
+    input logic [nb - 1:0]    data;
+    input logic [n - 1:0]     keep;
     input int                 pause;  // 0 - tvalid still high
 begin
       in_tdata  <= #1 data;
+      in_tkeep  <= #1 keep;
       in_tvalid <= #1 '1;
 
       for( int ii=0; ii<n; ii++ )
-        q_data.push_front( data[(n+ii)*8+:8]);
-
-      for( int ii=0; ii<n; ii++ )
-        q_data.push_front( data[ii*8+:8]);
+          if( keep[ii] )            // push to queue for valid data
+            q_data.push_front( data[(ii)*8+:8]);
 
       @(posedge aclk iff in_tvalid & in_tready);
       cnt_wr++;
       if( cnt_wr<16 ) begin
-        $display( "input: %s  (%h)", data, data );
+        $display( "input: %s  (%h) keep: %b", data, data, keep );
       end
 
       if( pause>0 ) begin
         in_tvalid <= #1 '0;
         in_tdata  <= #1 '0;
+        in_tkeep  <= #1 '0;
         for( int ii=0; ii<pause; ii++ )
           @(posedge aclk);
       end
@@ -118,14 +125,17 @@ end endtask
 
 task write_seq;
 begin
-  automatic logic [7:0]  data_out=8'h41;
+  automatic logic [7:0]       data_out=8'h41;
   automatic logic [nb*2-1:0]  val;
-  automatic int pause;
+  automatic int               pause;
+  automatic logic [n-1:0]     keep;
 
   //while(1) begin
     for( int jj=0; jj<500; jj++ ) begin
 
       pause = $urandom_range( 0, 3 );
+
+      keep =  $urandom_range( 0, maxkeep-1 );
 
       for( int ii=0; ii<n*2; ii++ ) begin
         val[ii*8+:8] = data_out;
@@ -134,7 +144,7 @@ begin
           data_out=8'h41;
 
       end
-      write_data( val, pause );
+      write_data( val, keep, pause );
     end 
   //   if( 100==$get_coverage())
   //     break;
@@ -276,6 +286,28 @@ initial begin
   case( test_id )
   0: begin
       $display("Test 0: %s", test_name[0]);
+
+// 1     ABCDEFGHIJ  0001101011
+// 2     KLMONPQRST  1001001111
+// 3     UVWXYabcde  1011110000
+// 4     fghijklmno  1010101000      
+
+            @(posedge aclk);
+            write_data( "ABCDEFGHIJ", 10'b0001101011, 0 );
+
+            write_data( "KLMONPQRST", 10'b1001001111, 2 );
+
+
+            write_data( "UVWXYabcde", 10'b1011110000, 1 );
+            set_outready_cnt(4);
+            write_data( "fghijklmno", 10'b1010101000, 1 );
+            write_data( "ABCDEFGHIJ", 10'b1101101011, 2 );
+            set_outready_cnt(2);
+            write_data( "KLMONPQRST", 10'b1111111111, 0 );
+            set_outready_cnt(1);
+            write_data( "UVWXYabcde", 10'b1011100111, 0 );
+            set_outready_cnt(2);
+            write_data( "fghijklmno", 10'b1010101001, 1 );
 
   end
   1: begin

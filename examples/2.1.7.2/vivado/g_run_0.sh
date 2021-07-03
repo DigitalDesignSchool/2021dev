@@ -1,0 +1,1 @@
+xsim -gui tb_behav --view ./wave.wcfg --testplusarg test_id=0 

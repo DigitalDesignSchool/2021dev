@@ -102,7 +102,7 @@ begin
       in_tkeep  <= #1 keep;
       in_tvalid <= #1 '1;
 
-      for( int ii=0; ii<n; ii++ )
+      for( int ii=n-1; ii>=0; ii-- )
           if( keep[ii] )            // push to queue for valid data
             q_data.push_front( data[(ii)*8+:8]);
 
@@ -260,7 +260,7 @@ always @(posedge aclk)
 
 always @(posedge aclk)
   if( out_tvalid & out_tready ) begin
-    for( int ii=0; ii<n; ii++) begin
+    for( int ii=n-1; ii>=0; ii--) begin
       expect_tdata[ii*8+:8] = q_data.pop_back();
     end
 
@@ -305,9 +305,25 @@ initial begin
             set_outready_cnt(2);
             write_data( "KLMONPQRST", 10'b1111111111, 0 );
             set_outready_cnt(1);
-            write_data( "UVWXYabcde", 10'b1011100111, 0 );
+            write_data( "UVWXYabcde", 10'b1011101111, 0 );
             set_outready_cnt(2);
             write_data( "fghijklmno", 10'b1010101001, 1 );
+
+            write_data( "A         ", 10'b1000000000, 1 );
+            write_data( " B        ", 10'b0100000000, 1 );
+            write_data( "  C       ", 10'b0010000000, 0 );
+            write_data( "   D      ", 10'b0001000000, 1 );
+            write_data( "    E     ", 10'b0000100000, 0 );
+            write_data( "     F    ", 10'b0000010000, 2 );
+            write_data( "      G   ", 10'b0000001000, 1 );
+            write_data( "       H  ", 10'b0000000100, 1 );
+            write_data( "        I ", 10'b0000000010, 1 );
+            write_data( "         J", 10'b0000000001, 1 );
+
+             #500;
+
+             test_done=1;
+
 
   end
   1: begin
@@ -351,9 +367,6 @@ initial begin
   test_start = '1;
 
   @(posedge aclk iff test_done=='1 || test_timeout=='1);
-
-  if( cnt_wr*2 != cnt_rd )
-    cnt_error++;
 
   if( test_timeout )
     cnt_error++;

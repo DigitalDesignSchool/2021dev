@@ -36,7 +36,7 @@ assign in_tready = flag_hf & out_tready;
 assign out_tvalid = in_tvalid;
 
 
-
+/*
 covergroup cvr  @ (posedge aclk iff aresetn);
     option.comment      = "Comment for the report: downsizing covergroup";
     option.per_instance = 1;
@@ -127,7 +127,7 @@ endgroup
       
 cvr cg = new ();    
 
-
+*/
 endmodule
 
 `default_nettype wire

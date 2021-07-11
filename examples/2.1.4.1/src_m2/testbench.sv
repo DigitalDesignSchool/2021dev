@@ -3,9 +3,12 @@
 
 `default_nettype none
 
-`include "transaction_pkg.sv"
+`include "transaction_pkg.svh"
+//`include "global_memory_pkg.svh"
+`include "golden_memory_pkg.svh"
 
 import transaction_pkg::*;
+import golden_memory_pkg::*;
 
 module tb
   ();
@@ -53,6 +56,9 @@ logic               test_timeout=0;
 logic               test_done=0;
 int                 out_ready_cnt=0;
 
+golden_memory_t     golden_memory;
+int                 tick_current=0;
+
 // Queue
 // type_transaction_rd q0_transaction_drive_rd  [$];
 // type_transaction_rd q1_transaction_drive_rd  [$];
@@ -70,8 +76,13 @@ int                 out_ready_cnt=0;
 type_transaction_rd qa_transaction_drive_rd[REQUESTERS-1:0]  [$];
 type_transaction_rd qa_transaction_check_rd[REQUESTERS-1:0]  [$];
 type_transaction_rd current_drive_rd[REQUESTERS-1:0];
+type_transaction_rd current_check_rd[REQUESTERS-1:0];
 
 type_uut  u[REQUESTERS-1:0];
+
+logic [2*REQUESTERS-1:0]					        mask_avaliable[REQUESTERS-1:0];
+logic [2*REQUESTERS-1:0][DATA_WIDTH-1:0]	expect_data[REQUESTERS-1:0];
+logic                                     flag_eq[REQUESTERS-1:0];
 
 // localparam  REQUESTERS = 3;
 // localparam  DATA_WIDTH = 16;
@@ -160,6 +171,7 @@ always #5 clk = ~clk;
 
 // end
 
+// // Driver
 genvar ii;
 generate
   for( ii=0; ii<REQUESTERS; ii++ ) begin
@@ -196,87 +208,72 @@ generate
 endgenerate
 
 
-// initial begin
+// // Monitor
+generate
+  for( ii=0; ii<REQUESTERS; ii++ ) begin
 
-//   //r_avalid[0]  <= #1 '0;
-//   r0_avalid  <= #1 '0;
+    always @(posedge clk iff '1==u[ii].r_dvalid) begin
 
-//   while(1) begin
-//       @(posedge clk iff(q0_transaction_drive_rd.size()>0));
+      if( 0==qa_transaction_check_rd[ii].size() ) begin
+          if( cnt_error<16 ) begin
+              $display("Error: unexpected rd_data for port %d. read: %h", ii, u[ii].r_data);
+          end
+          cnt_error++;
+      end else begin
 
-//       current_drive_rd_0 = q0_transaction_drive_rd.pop_front();
-//       r0_addr   <= #1 current_drive_rd_0.addr;
-//       r0_avalid <= #1 '1;
+          current_check_rd[ii] = qa_transaction_check_rd[ii].pop_front();
+          $display("current_check_rd[%d] addr: %h ", ii, current_check_rd[ii].addr );
+          golden_memory.get_data( tick_current, ii, current_check_rd[ii].addr, 
+            mask_avaliable[ii], expect_data[ii]
+          );
+          flag_eq[ii]=0;
+          for( int jj=0; jj<2*REQUESTERS; jj++) begin
+              if( mask_avaliable[ii][jj] &&  
+                  (u[ii].r_data == expect_data[ii][jj] )
+              ) begin
+                flag_eq[ii]=1;
+                break;
+              end
+          end
 
-//       // r_addr[0]  <= #1 current_drive_rd_0.addr;
-//       // r_avalid[0]  <= #1 '1;
+          if( 1==flag_eq[ii] ) begin
+              if( cnt_ok<16 ) begin
+                 $display("Read: ok: %-d error: %-d  port: %d  adr=%h read: %h mask_avaliable: %h  - Ok",
+                  cnt_ok, cnt_error, ii, current_check_rd[ii].addr, u[ii].r_data, mask_avaliable[ii]
+                 ); 
+                 for( int jj=0; jj<2*REQUESTERS; jj++) begin
+                    if( mask_avaliable[ii][jj] )  
+                        $display( "   expect data: %h", expect_data[ii][jj] );
+                    
+                end 
+              end
+              cnt_ok++;
+          end else begin
+              if( cnt_error<16 ) begin
+                 $display("Read: ok: %-d error: %-d  port: %d adr: %h read: %h  mask_avaliable: %h - Error",
+                    cnt_ok, cnt_error, ii, current_check_rd[ii].addr, u[ii].r_data, mask_avaliable[ii]
+                 );
+                 for( int jj=0; jj<2*REQUESTERS; jj++) begin
+                    if( mask_avaliable[ii][jj] )  
+                        $display( "   expect data: %h", expect_data[ii][jj] );
+                    
+                end 
+              end
+              cnt_error++;
+          end
 
-//       @(posedge clk iff r0_aready & r0_avalid);
+      end
+    end
 
-//       if( current_drive_rd_0.delay>0 ) begin
-//         //r_avalid[0]  <= #1 '0;
-//         r0_avalid  <= #1 '0;
-//       end else begin
-//         repeat(current_drive_rd_0.delay) @(posedge clk);
-//       end
-//       //current_drive_rd_0 = null;
-//   end
+    // Golden Memory
+    always @(posedge clk iff u[ii].w_valid & u[ii].w_ready ) begin
+      golden_memory.write_mem( tick_current, ii, u[ii].w_addr, u[ii].w_data );
+    end
 
-// end
+  end
+endgenerate
 
-// initial begin
 
-//   //r_avalid[1]  <= #1 '1;
-//   r1_avalid  <= #1 '0;
-
-//   while(1) begin
-//       @(posedge clk iff(q1_transaction_drive_rd.size()>0));
-
-//       current_drive_rd_1 = q1_transaction_drive_rd.pop_front();
-//       r1_addr   <= #1 current_drive_rd_1.addr;
-//       r1_avalid <= #1 '1;
-//       // r_addr[1]  <= #1 current_drive_rd_1.addr;
-//       // r_avalid[1]  <= #1 '1;
-
-//       @(posedge clk iff r1_aready & r1_avalid);
-
-//       if( current_drive_rd_1.delay>0 ) begin
-//         //r_avalid[1]  <= #1 '1;
-//         r1_avalid  <= #1 '0;
-//       end else begin
-//         repeat(current_drive_rd_1.delay) @(posedge clk);
-//       end
-//       //current_drive_rd_1 = null;
-//   end
-
-// end
-
-// initial begin
-
-//   //r_avalid[2]  <= #1 '0;
-//   r2_avalid  <= #1 '0;
-
-//   while(1) begin
-//       @(posedge clk iff(q2_transaction_drive_rd.size()>0));
-
-//       current_drive_rd_2 = q2_transaction_drive_rd.pop_front();
-//       r2_addr   <= #1 current_drive_rd_2.addr;
-//       r2_avalid <= #1 '1;
-//       // r_addr[2]  <= #1 current_drive_rd_2.addr;
-//       // r_avalid[2]  <= #1 '1;
-
-//       @(posedge clk iff r2_aready & r2_avalid);
-
-//       if( current_drive_rd_2.delay>0 ) begin
-//         //r_avalid[2]  <= #1 '0;
-//         r2_avalid  <= #1 '0;
-//       end else begin
-//         repeat(current_drive_rd_2.delay) @(posedge clk);
-//       end
-//       //current_drive_rd_2 = null;
-//   end
-
-// end
 
 
 task read_data;
@@ -403,6 +400,8 @@ initial begin
 
 end 
 
+always @(posedge clk)  tick_current <= #1 tick_current+1;
+
 initial begin
     #100000;
     $display( "Timeout");
@@ -424,9 +423,11 @@ initial begin
 
   $display("Test multi_memory test_id=%d  name:", test_id, test_name[test_id] );
   
+  golden_memory = new();
+
   rst = '1;
 
-  #100;
+  #200;
 
   rst =  '0;
 

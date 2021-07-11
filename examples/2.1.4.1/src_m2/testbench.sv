@@ -54,40 +54,47 @@ logic               test_done=0;
 int                 out_ready_cnt=0;
 
 // Queue
-type_transaction_rd q0_transaction_drive_rd  [$];
-type_transaction_rd q1_transaction_drive_rd  [$];
-type_transaction_rd q2_transaction_drive_rd  [$];
+// type_transaction_rd q0_transaction_drive_rd  [$];
+// type_transaction_rd q1_transaction_drive_rd  [$];
+// type_transaction_rd q2_transaction_drive_rd  [$];
 
-type_transaction_rd current_drive_rd_0;
-type_transaction_rd current_drive_rd_1;
-type_transaction_rd current_drive_rd_2;
-
-type_transaction_rd q0_transaction_check_rd  [$];
-type_transaction_rd q1_transaction_check_rd  [$];
-type_transaction_rd q2_transaction_check_rd  [$];
+// type_transaction_rd current_drive_rd_0;
+// type_transaction_rd current_drive_rd_1;
+// type_transaction_rd current_drive_rd_2;
 
 
-localparam  REQUESTERS = 3;
-localparam  DATA_WIDTH = 16;
-localparam  ADDR_WIDTH = 16;
+// type_transaction_rd q0_transaction_check_rd  [$];
+// type_transaction_rd q1_transaction_check_rd  [$];
+// type_transaction_rd q2_transaction_check_rd  [$];
 
-logic [ADDR_WIDTH-1:0]  r0_addr;
-logic 				          r0_avalid;
-logic      		          r0_dvalid;
-logic [DATA_WIDTH-1:0]  r0_data;
-logic                   r0_aready;
+type_transaction_rd qa_transaction_drive_rd[REQUESTERS-1:0]  [$];
+type_transaction_rd qa_transaction_check_rd[REQUESTERS-1:0]  [$];
+type_transaction_rd current_drive_rd[REQUESTERS-1:0];
 
-logic [ADDR_WIDTH-1:0]  r1_addr;
-logic 				          r1_avalid;
-logic      		          r1_dvalid;
-logic [DATA_WIDTH-1:0]  r1_data;
-logic                   r1_aready;
+type_uut  u[REQUESTERS-1:0];
 
-logic [ADDR_WIDTH-1:0]  r2_addr;
-logic 				          r2_avalid;
-logic      		          r2_dvalid;
-logic [DATA_WIDTH-1:0]  r2_data;
-logic                   r2_aready;
+// localparam  REQUESTERS = 3;
+// localparam  DATA_WIDTH = 16;
+// localparam  ADDR_WIDTH = 16;
+
+
+// logic [ADDR_WIDTH-1:0]  r0_addr;
+// logic 				          r0_avalid;
+// logic      		          r0_dvalid;
+// logic [DATA_WIDTH-1:0]  r0_data;
+// logic                   r0_aready;
+
+// logic [ADDR_WIDTH-1:0]  r1_addr;
+// logic 				          r1_avalid;
+// logic      		          r1_dvalid;
+// logic [DATA_WIDTH-1:0]  r1_data;
+// logic                   r1_aready;
+
+// logic [ADDR_WIDTH-1:0]  r2_addr;
+// logic 				          r2_avalid;
+// logic      		          r2_dvalid;
+// logic [DATA_WIDTH-1:0]  r2_data;
+// logic                   r2_aready;
 
 
 
@@ -99,10 +106,10 @@ logic                   r2_aready;
 // logic [REQUESTERS-1:0]     		          r_dvalid;
 // logic [REQUESTERS-1:0][DATA_WIDTH-1:0]  r_data;
 // logic [REQUESTERS-1:0]				          r_aready;
-logic [REQUESTERS-1:0][ADDR_WIDTH-1:0]  w_addr;
-logic [REQUESTERS-1:0][DATA_WIDTH-1:0]  w_data;
-logic [REQUESTERS-1:0]  			          w_valid;
-logic [REQUESTERS-1:0]				          w_ready;
+// logic [REQUESTERS-1:0][ADDR_WIDTH-1:0]  w_addr;
+// logic [REQUESTERS-1:0][DATA_WIDTH-1:0]  w_data;
+// logic [REQUESTERS-1:0]  			          w_valid;
+// logic [REQUESTERS-1:0]				          w_ready;
 
 multimemory
 #(
@@ -111,13 +118,20 @@ multimemory
     .ADDR_WIDTH     (   ADDR_WIDTH  )
 ) uut
 (
-    .r_addr         (   {r2_addr,   r1_addr,    r0_addr   } ),
-    .r_avalid       (   {r2_avalid, r1_avalid,  r0_avalid } ),
-    .r_dvalid       (   {r2_dvalid, r1_dvalid,  r0_dvalid } ),
-    .r_data         (   {r2_data,   r1_data,    r0_data   } ),
-    .r_aready       (   {r2_aready, r1_aready,  r0_aready } ),
+    .r_addr         (   {u[2].r_addr,   u[1].r_addr,    u[0].r_addr   } ),
+    .r_avalid       (   {u[2].r_avalid, u[1].r_avalid,  u[0].r_avalid } ),
+    .r_dvalid       (   {u[2].r_dvalid, u[1].r_dvalid,  u[0].r_dvalid } ),
+    .r_data         (   {u[2].r_data,   u[1].r_data,    u[0].r_data   } ),
+    .r_aready       (   {u[2].r_aready, u[1].r_aready,  u[0].r_aready } ),
+
+    .w_addr         (   {u[2].w_addr,   u[1].w_addr,    u[0].w_addr   } ),
+    .w_data         (   {u[2].w_data,   u[1].w_data,    u[0].w_data   } ),
+    .w_valid        (   {u[2].w_valid,  u[1].w_valid,   u[0].w_valid } ),
+    .w_ready        (   {u[2].w_ready,  u[1].w_ready,   u[0].w_ready } ),
 
                     .*
+
+                    
 );
 
 
@@ -146,87 +160,123 @@ always #5 clk = ~clk;
 
 // end
 
-initial begin
+genvar ii;
+generate
+  for( ii=0; ii<REQUESTERS; ii++ ) begin
 
-  //r_avalid[0]  <= #1 '0;
-  r0_avalid  <= #1 '0;
+    initial begin
 
-  while(1) begin
-      @(posedge clk iff(q0_transaction_drive_rd.size()>0));
+      //r_avalid[0]  <= #1 '0;
+      u[ii].r_avalid  <= #1 '0;
 
-      current_drive_rd_0 = q0_transaction_drive_rd.pop_front();
-      r0_addr   <= #1 current_drive_rd_0.addr;
-      r0_avalid <= #1 '1;
+      while(1) begin
+          @(posedge clk iff(qa_transaction_drive_rd[ii].size()>0));
 
-      // r_addr[0]  <= #1 current_drive_rd_0.addr;
-      // r_avalid[0]  <= #1 '1;
+          current_drive_rd[ii] = qa_transaction_drive_rd[ii].pop_front();
+          u[ii].r_addr   <= #1 current_drive_rd[ii].addr;
+          u[ii].r_avalid <= #1 '1;
 
-      @(posedge clk iff r0_aready & r0_avalid);
+          // r_addr[0]  <= #1 current_drive_rd_0.addr;
+          // r_avalid[0]  <= #1 '1;
 
-      if( current_drive_rd_0.delay>0 ) begin
-        //r_avalid[0]  <= #1 '0;
-        r0_avalid  <= #1 '0;
-      end else begin
-        repeat(current_drive_rd_0.delay) @(posedge clk);
+          @(posedge clk iff u[ii].r_aready & u[ii].r_avalid);
+
+          if( current_drive_rd[ii].delay>0 ) begin
+            //r_avalid[0]  <= #1 '0;
+            u[ii].r_avalid  <= #1 '0;
+          end else begin
+            repeat(current_drive_rd[ii].delay) @(posedge clk);
+          end
+          //current_drive_rd_0 = null;
       end
-      //current_drive_rd_0 = null;
+
+    end
+
   end
+endgenerate
 
-end
 
-initial begin
+// initial begin
 
-  //r_avalid[1]  <= #1 '1;
-  r1_avalid  <= #1 '0;
+//   //r_avalid[0]  <= #1 '0;
+//   r0_avalid  <= #1 '0;
 
-  while(1) begin
-      @(posedge clk iff(q1_transaction_drive_rd.size()>0));
+//   while(1) begin
+//       @(posedge clk iff(q0_transaction_drive_rd.size()>0));
 
-      current_drive_rd_1 = q1_transaction_drive_rd.pop_front();
-      r1_addr   <= #1 current_drive_rd_1.addr;
-      r1_avalid <= #1 '1;
-      // r_addr[1]  <= #1 current_drive_rd_1.addr;
-      // r_avalid[1]  <= #1 '1;
+//       current_drive_rd_0 = q0_transaction_drive_rd.pop_front();
+//       r0_addr   <= #1 current_drive_rd_0.addr;
+//       r0_avalid <= #1 '1;
 
-      @(posedge clk iff r1_aready & r1_avalid);
+//       // r_addr[0]  <= #1 current_drive_rd_0.addr;
+//       // r_avalid[0]  <= #1 '1;
 
-      if( current_drive_rd_1.delay>0 ) begin
-        //r_avalid[1]  <= #1 '1;
-        r1_avalid  <= #1 '0;
-      end else begin
-        repeat(current_drive_rd_1.delay) @(posedge clk);
-      end
-      //current_drive_rd_1 = null;
-  end
+//       @(posedge clk iff r0_aready & r0_avalid);
 
-end
+//       if( current_drive_rd_0.delay>0 ) begin
+//         //r_avalid[0]  <= #1 '0;
+//         r0_avalid  <= #1 '0;
+//       end else begin
+//         repeat(current_drive_rd_0.delay) @(posedge clk);
+//       end
+//       //current_drive_rd_0 = null;
+//   end
 
-initial begin
+// end
 
-  //r_avalid[2]  <= #1 '0;
-  r2_avalid  <= #1 '0;
+// initial begin
 
-  while(1) begin
-      @(posedge clk iff(q2_transaction_drive_rd.size()>0));
+//   //r_avalid[1]  <= #1 '1;
+//   r1_avalid  <= #1 '0;
 
-      current_drive_rd_2 = q2_transaction_drive_rd.pop_front();
-      r2_addr   <= #1 current_drive_rd_2.addr;
-      r2_avalid <= #1 '1;
-      // r_addr[2]  <= #1 current_drive_rd_2.addr;
-      // r_avalid[2]  <= #1 '1;
+//   while(1) begin
+//       @(posedge clk iff(q1_transaction_drive_rd.size()>0));
 
-      @(posedge clk iff r2_aready & r2_avalid);
+//       current_drive_rd_1 = q1_transaction_drive_rd.pop_front();
+//       r1_addr   <= #1 current_drive_rd_1.addr;
+//       r1_avalid <= #1 '1;
+//       // r_addr[1]  <= #1 current_drive_rd_1.addr;
+//       // r_avalid[1]  <= #1 '1;
 
-      if( current_drive_rd_2.delay>0 ) begin
-        //r_avalid[2]  <= #1 '0;
-        r2_avalid  <= #1 '0;
-      end else begin
-        repeat(current_drive_rd_2.delay) @(posedge clk);
-      end
-      //current_drive_rd_2 = null;
-  end
+//       @(posedge clk iff r1_aready & r1_avalid);
 
-end
+//       if( current_drive_rd_1.delay>0 ) begin
+//         //r_avalid[1]  <= #1 '1;
+//         r1_avalid  <= #1 '0;
+//       end else begin
+//         repeat(current_drive_rd_1.delay) @(posedge clk);
+//       end
+//       //current_drive_rd_1 = null;
+//   end
+
+// end
+
+// initial begin
+
+//   //r_avalid[2]  <= #1 '0;
+//   r2_avalid  <= #1 '0;
+
+//   while(1) begin
+//       @(posedge clk iff(q2_transaction_drive_rd.size()>0));
+
+//       current_drive_rd_2 = q2_transaction_drive_rd.pop_front();
+//       r2_addr   <= #1 current_drive_rd_2.addr;
+//       r2_avalid <= #1 '1;
+//       // r_addr[2]  <= #1 current_drive_rd_2.addr;
+//       // r_avalid[2]  <= #1 '1;
+
+//       @(posedge clk iff r2_aready & r2_avalid);
+
+//       if( current_drive_rd_2.delay>0 ) begin
+//         //r_avalid[2]  <= #1 '0;
+//         r2_avalid  <= #1 '0;
+//       end else begin
+//         repeat(current_drive_rd_2.delay) @(posedge clk);
+//       end
+//       //current_drive_rd_2 = null;
+//   end
+
+// end
 
 
 task read_data;
@@ -242,16 +292,22 @@ begin
 
   case( qn )
     0: begin 
-        q0_transaction_drive_rd.push_back(tr_rd);
-        q0_transaction_check_rd.push_back(tr_rd);
+        //q0_transaction_drive_rd.push_back(tr_rd);
+        //q0_transaction_check_rd.push_back(tr_rd);
+        qa_transaction_drive_rd[0].push_back(tr_rd);
+        qa_transaction_check_rd[0].push_back(tr_rd);
     end
     1: begin
-        q1_transaction_drive_rd.push_back(tr_rd);
-        q1_transaction_check_rd.push_back(tr_rd);
+        //q1_transaction_drive_rd.push_back(tr_rd);
+        //q1_transaction_check_rd.push_back(tr_rd);
+        qa_transaction_drive_rd[1].push_back(tr_rd);
+        qa_transaction_check_rd[1].push_back(tr_rd);
     end
     2: begin  
-        q2_transaction_drive_rd.push_back(tr_rd);
-        q2_transaction_check_rd.push_back(tr_rd);
+        //q2_transaction_drive_rd.push_back(tr_rd);
+        //q2_transaction_check_rd.push_back(tr_rd);
+        qa_transaction_drive_rd[2].push_back(tr_rd);
+        qa_transaction_check_rd[2].push_back(tr_rd);
     end
   endcase;
 
@@ -329,7 +385,11 @@ initial begin
   // Wait for empty queues
   while(1) begin
 
-    if( 0==q0_transaction_drive_rd.size() ) begin
+    if(   
+             0==qa_transaction_drive_rd[0].size() 
+          && 0==qa_transaction_drive_rd[1].size() 
+          && 0==qa_transaction_drive_rd[2].size() 
+    ) begin
       break;
     end
 

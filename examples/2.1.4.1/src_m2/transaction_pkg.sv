@@ -2,6 +2,11 @@
 package transaction_pkg;
 
 
+localparam  REQUESTERS = 3;
+localparam  DATA_WIDTH = 16;
+localparam  ADDR_WIDTH = 16;
+
+
 typedef struct
 {
     logic   [15:0]      addr;
@@ -17,6 +22,20 @@ typedef struct
     int 		       	delay;
 
 } type_transaction_rd;
+
+typedef struct
+{
+    logic [ADDR_WIDTH-1:0]  r_addr;
+    logic 				    r_avalid;
+    logic      		        r_dvalid;
+    logic [DATA_WIDTH-1:0]  r_data;
+    logic                   r_aready;
+
+    logic [ADDR_WIDTH-1:0]  w_addr;
+    logic [DATA_WIDTH-1:0]  w_data;
+    logic   			    w_valid;
+    logic   		        w_ready;
+} type_uut;
 
 // class type_transaction_wr;
 

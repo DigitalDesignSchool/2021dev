@@ -75,37 +75,52 @@ module multimemory
   reg [REQUESTERS-1:0] sync_w_ready;
 
   always @(posedge clk) begin
-    mem_r_avalid <= 0;
-    mem_w_valid <= 0;
 
-    if (rst)
-      r_dvalid_shift <= '{DATA_LAT{0}};
-    else begin
-      sync_r_aready <= r_grant;
-      sync_w_ready  <= w_grant;
+    mem_r_addr  <= #1 '0;
+    mem_r_avalid <= #1 '0;
+    mem_w_addr  <= #1 '0;
+    mem_w_data  <= #1 '0;
+    mem_w_valid <= #1 '0;
 
-      r_dvalid_shift[0] <= r_grant;
+    if (rst) begin
+      mem_r_addr  <= #1 '0;
+      mem_r_avalid <= #1 '0;
+      mem_w_addr  <= #1 '0;
+      mem_w_data  <= #1 '0;
+      mem_w_valid <= #1 '0;
+
+    end else begin
+
       // Put
       for (int r = 0; r < REQUESTERS; r++) begin
-        if(r_grant[r]) begin
-          mem_r_addr  <= r_addr[r];
-          mem_r_avalid <= 1;
+
+        if(r_aready[r]=='1 && r_avalid[r]=='1 ) begin
+          mem_r_addr  <= #1 r_addr[r];
+          mem_r_avalid <= #1 '1;
+          r_dvalid_shift[0][r] <= #1 '1;
+        end else begin
+          r_dvalid_shift[0][r] <= #1 '0;
         end
-        if(w_grant[r]) begin
-          mem_w_addr  <= w_addr[r];
-          mem_w_data  <= w_data[r];
-          mem_w_valid <= 1;
-        end
+
+        if(w_ready[r]=='1 && w_valid[r]=='1 )  begin
+          mem_w_addr  <= #1 w_addr[r];
+          mem_w_data  <= #1 w_data[r];
+          mem_w_valid <= #1 '1;
+        end 
       end
 
       // Shift
-      for (int i = 1; i < DATA_LAT; i++)
-        r_dvalid_shift[i] <= r_dvalid_shift[i - 1];
+      if (rst) begin
+        r_dvalid_shift <= #1 '{DATA_LAT{0}};
+      end else begin
+        for (int i = 1; i < DATA_LAT; i++)
+          r_dvalid_shift[i] <= #1 r_dvalid_shift[i - 1];
+      end
     end
   end
   
-  assign r_aready = sync_r_aready;
-  assign w_ready  = sync_w_ready;
+  assign r_aready = r_grant;
+  assign w_ready  = w_grant;
   assign r_dvalid = r_dvalid_shift[DATA_LAT-1];
   
   // connect all requesters to the data wire

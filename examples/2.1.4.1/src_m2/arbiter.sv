@@ -31,17 +31,17 @@ module arbiter
   
   always @ (posedge clk)
     if (rst)
-      pointer_req <= 1;
+      pointer_req <= #1 1;
   	else if (async_pointer_req == 0)
-      pointer_req <= 1;
+      pointer_req <= #1 1;
     else	 
-      pointer_req <= async_pointer_req;
+      pointer_req <= #1 async_pointer_req;
 
   //Synchronous grant update
   always @ (posedge clk)
     if (rst) 
-      next_grant[N-1:0] <= {N{1'b0}}; 
+      next_grant[N-1:0] <= #1 {N{1'b0}}; 
     else 
-      next_grant <= async_next_grand;
+      next_grant <= #1 async_next_grand;
 
 endmodule

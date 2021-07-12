@@ -182,9 +182,22 @@ generate
       u[ii].r_avalid  <= #1 '0;
 
       while(1) begin
-          @(posedge clk iff(qa_transaction_drive_rd[ii].size()>0));
+          while(1) begin
+           //@(posedge clk iff(qa_transaction_drive_rd[ii].size()>0));
+           if( qa_transaction_drive_rd[ii].size()>0 ) 
+              break;
+            else
+              #1;
+          end
 
           current_drive_rd[ii] = qa_transaction_drive_rd[ii].pop_front();
+
+          if( 3==current_drive_rd[ii].op ) 
+            break;
+          if( 2==current_drive_rd[ii].op ) begin
+              @(posedge clk iff tick_current==current_drive_rd[ii].sync_tick );
+              continue;
+          end
           u[ii].r_addr   <= #1 current_drive_rd[ii].addr;
           u[ii].r_avalid <= #1 '1;
 
@@ -196,8 +209,12 @@ generate
           if( current_drive_rd[ii].delay>0 ) begin
             //r_avalid[0]  <= #1 '0;
             u[ii].r_avalid  <= #1 '0;
-          end else begin
+            u[ii].r_addr   <= #1 '0;
             repeat(current_drive_rd[ii].delay) @(posedge clk);
+          end else if( qa_transaction_drive_rd[ii].size()==0) begin
+            u[ii].r_avalid  <= #1 '0;
+            u[ii].r_addr   <= #1 '0;
+            @(posedge clk iff(qa_transaction_drive_rd[ii].size()>0));
           end
           //current_drive_rd_0 = null;
       end
@@ -284,29 +301,26 @@ begin
 
   //type_transaction_rd tr_rd  = new( addr, delay );
   automatic type_transaction_rd tr_rd;
-    tr_rd.addr = addr;
-    tr_rd.delay =delay;
+    tr_rd.addr      = addr;
+    tr_rd.delay     = delay;
+    tr_rd.op        = 1;
+    tr_rd.sync_tick = 0;
 
-  case( qn )
-    0: begin 
-        //q0_transaction_drive_rd.push_back(tr_rd);
-        //q0_transaction_check_rd.push_back(tr_rd);
+  if( qn & 1 )  begin 
         qa_transaction_drive_rd[0].push_back(tr_rd);
         qa_transaction_check_rd[0].push_back(tr_rd);
-    end
-    1: begin
-        //q1_transaction_drive_rd.push_back(tr_rd);
-        //q1_transaction_check_rd.push_back(tr_rd);
+  end
+  
+  if( qn & 2 )  begin 
         qa_transaction_drive_rd[1].push_back(tr_rd);
         qa_transaction_check_rd[1].push_back(tr_rd);
-    end
-    2: begin  
-        //q2_transaction_drive_rd.push_back(tr_rd);
-        //q2_transaction_check_rd.push_back(tr_rd);
+  end
+
+  if( qn & 4 )  begin 
         qa_transaction_drive_rd[2].push_back(tr_rd);
         qa_transaction_check_rd[2].push_back(tr_rd);
-    end
-  endcase;
+  end
+  
 
 end endtask;
 
@@ -320,33 +334,105 @@ begin
 end endtask;
 
 
+task sync;
+  input int     qr;
+  input int     qw;
+  input int     sync_tick;
+begin
+
+ automatic type_transaction_rd tr_rd;
+    tr_rd.addr      = 0;
+    tr_rd.delay     = 0;
+    tr_rd.op        = 2;
+    tr_rd.sync_tick = sync_tick;
+
+  if( qr & 1 )  begin 
+        qa_transaction_drive_rd[0].push_back(tr_rd);
+  end
+  
+  if( qr & 2 )  begin 
+        qa_transaction_drive_rd[1].push_back(tr_rd);
+  end
+
+  if( qr & 4 )  begin 
+        qa_transaction_drive_rd[2].push_back(tr_rd);
+  end
+
+end endtask;
+
+task q_end;
+  input int     qr;
+  input int     qw;
+begin
+
+ automatic type_transaction_rd tr_rd;
+    tr_rd.addr      = 0;
+    tr_rd.delay     = 0;
+    tr_rd.op        = 3;
+    tr_rd.sync_tick = 0;
+
+  if( qr & 1 )  begin 
+        qa_transaction_drive_rd[0].push_back(tr_rd);
+        //qa_transaction_check_rd[0].push_back(tr_rd);
+  end
+  
+  if( qr & 2 )  begin 
+        qa_transaction_drive_rd[1].push_back(tr_rd);
+        //qa_transaction_check_rd[1].push_back(tr_rd);
+  end
+
+  if( qr & 4 )  begin 
+        qa_transaction_drive_rd[2].push_back(tr_rd);
+        //qa_transaction_check_rd[2].push_back(tr_rd);
+  end
+
+end endtask;
+
+
 task test_seq0;
 begin
-      read_data( 0, 16'h0010, 2 );
-      read_data( 0, 16'h0011, 2 );
-      read_data( 0, 16'h0012, 2 );
-      write_data( 0, 16'h0212, 16'hA012, 1 );
+      read_data( 1, 16'h0010, 2 );
+      read_data( 1, 16'h0011, 2 );
+      read_data( 1, 16'h0012, 2 );
+      write_data( 1, 16'h0212, 16'hA012, 1 );
+      sync( 1, 0, 'h40 );
+      q_end( 1, 1 );
+
 end endtask;
 
 task test_seq1;
 begin
-      // read_data( 1, 16'h0110, 2 );
-      // read_data( 1, 16'h0111, 2 );
-      // read_data( 1, 16'h0112, 2 );
+       read_data( 2, 16'h0110, 2 );
+       read_data( 2, 16'h0111, 2 );
+       read_data( 2, 16'h0112, 2 );
+       read_data( 2, 16'h0113, 2 );
+       read_data( 2, 16'h0114, 2 );
+
+       sync( 4, 0, 'h40 );
+       read_data( 2, 16'h0115, 0 );
+       read_data( 2, 16'h0116, 0 );
+       read_data( 2, 16'h0117, 1 );
+
+       q_end( 2, 2 );
 
 end endtask;
 
 task test_seq2;
 begin
-      // read_data( 2, 16'h0210, 2 );
-      // read_data( 2, 16'h0211, 2 );
-      // read_data( 2, 16'h0212, 0 );
-      // read_data( 2, 16'h0212, 0 );
-      // read_data( 2, 16'h0212, 0 );
-      // read_data( 2, 16'h0212, 0 );
-      // read_data( 2, 16'h0212, 0 );
-      // read_data( 2, 16'h0212, 0 );
-      // read_data( 2, 16'h0212, 0 );
+      read_data( 4, 16'h0210, 2 );
+      read_data( 4, 16'h0211, 2 );
+      read_data( 4, 16'h0212, 0 );
+      read_data( 4, 16'h0213, 0 );
+      read_data( 4, 16'h0214, 0 );
+      read_data( 4, 16'h0215, 0 );
+      read_data( 4, 16'h0216, 0 );
+      read_data( 4, 16'h0217, 0 );
+      read_data( 4, 16'h0218, 1 );
+
+      sync( 4, 0, 'h80 );      
+      read_data( 4, 16'h0219, 4 );
+
+      q_end( 4, 4 );
 
 end endtask;
 
@@ -371,8 +457,6 @@ initial begin
               join
             end
           join
-
-
   end
   1: begin
       $display("Test 1: %s", test_name[1]);

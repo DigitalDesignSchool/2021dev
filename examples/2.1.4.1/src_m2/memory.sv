@@ -31,7 +31,7 @@ module pseudo_dual_port_memory
 
   // Write data to memory
   always @(posedge clk)
-    memory[w_addr] <= w_data;
+    memory[w_addr] <= #1 w_data;
 
   // Read data from memory with latency
   reg 			   r_dvalid_shift [DATA_LAT];
@@ -39,21 +39,21 @@ module pseudo_dual_port_memory
 
   always @(posedge clk) begin
     if (rst)
-      r_dvalid_shift <= '{DATA_LAT{0}};
+      r_dvalid_shift <= #1 '{DATA_LAT{0}};
     else begin
-      r_dvalid_shift[0] <= r_avalid;
+      r_dvalid_shift[0] <= #1 r_avalid;
 
       // Forwarding
       // if( w_valid & (w_addr == r_addr) )
       //   r_data_shift[0]  <= w_data;
       // else 
       //   r_data_shift[0]  <= memory[r_addr];
-      r_data_shift[0]  <= memory[r_addr];
+      r_data_shift[0]  <= #1 memory[r_addr];
 
       // Shifting
       for (int i = 1; i < DATA_LAT; i++) begin
-        r_dvalid_shift[i] <= r_dvalid_shift[i - 1];
-        r_data_shift[i]   <= r_data_shift[i - 1];
+        r_dvalid_shift[i] <= #1 r_dvalid_shift[i - 1];
+        r_data_shift[i]   <= #1 r_data_shift[i - 1];
       end
     end
   end

@@ -60,23 +60,26 @@ golden_memory_t     golden_memory;
 int                 tick_current=0;
 
 // Queue
-// type_transaction_rd q0_transaction_drive_rd  [$];
-// type_transaction_rd q1_transaction_drive_rd  [$];
-// type_transaction_rd q2_transaction_drive_rd  [$];
+// type_transaction q0_transaction_drive_rd  [$];
+// type_transaction q1_transaction_drive_rd  [$];
+// type_transaction q2_transaction_drive_rd  [$];
 
-// type_transaction_rd current_drive_rd_0;
-// type_transaction_rd current_drive_rd_1;
-// type_transaction_rd current_drive_rd_2;
+// type_transaction current_drive_rd_0;
+// type_transaction current_drive_rd_1;
+// type_transaction current_drive_rd_2;
 
 
-// type_transaction_rd q0_transaction_check_rd  [$];
-// type_transaction_rd q1_transaction_check_rd  [$];
-// type_transaction_rd q2_transaction_check_rd  [$];
+// type_transaction q0_transaction_check_rd  [$];
+// type_transaction q1_transaction_check_rd  [$];
+// type_transaction q2_transaction_check_rd  [$];
 
-type_transaction_rd qa_transaction_drive_rd[REQUESTERS-1:0]  [$];
-type_transaction_rd qa_transaction_check_rd[REQUESTERS-1:0]  [$];
-type_transaction_rd current_drive_rd[REQUESTERS-1:0];
-type_transaction_rd current_check_rd[REQUESTERS-1:0];
+type_transaction qa_transaction_drive_rd[REQUESTERS-1:0]  [$];
+type_transaction qa_transaction_check_rd[REQUESTERS-1:0]  [$];
+type_transaction current_drive_rd[REQUESTERS-1:0];
+type_transaction current_check_rd[REQUESTERS-1:0];
+
+type_transaction qa_transaction_drive_wr[REQUESTERS-1:0]  [$];
+type_transaction current_drive_wr[REQUESTERS-1:0];
 
 type_uut  u[REQUESTERS-1:0];
 
@@ -84,43 +87,7 @@ logic [2*REQUESTERS-1:0]					        mask_avaliable[REQUESTERS-1:0];
 logic [2*REQUESTERS-1:0][DATA_WIDTH-1:0]	expect_data[REQUESTERS-1:0];
 logic                                     flag_eq[REQUESTERS-1:0];
 
-// localparam  REQUESTERS = 3;
-// localparam  DATA_WIDTH = 16;
-// localparam  ADDR_WIDTH = 16;
 
-
-// logic [ADDR_WIDTH-1:0]  r0_addr;
-// logic 				          r0_avalid;
-// logic      		          r0_dvalid;
-// logic [DATA_WIDTH-1:0]  r0_data;
-// logic                   r0_aready;
-
-// logic [ADDR_WIDTH-1:0]  r1_addr;
-// logic 				          r1_avalid;
-// logic      		          r1_dvalid;
-// logic [DATA_WIDTH-1:0]  r1_data;
-// logic                   r1_aready;
-
-// logic [ADDR_WIDTH-1:0]  r2_addr;
-// logic 				          r2_avalid;
-// logic      		          r2_dvalid;
-// logic [DATA_WIDTH-1:0]  r2_data;
-// logic                   r2_aready;
-
-
-
-
-
-
-//logic [REQUESTERS-1:0][ADDR_WIDTH-1:0]  r_addr;
-//logic [REQUESTERS-1:0]				          r_avalid;
-// logic [REQUESTERS-1:0]     		          r_dvalid;
-// logic [REQUESTERS-1:0][DATA_WIDTH-1:0]  r_data;
-// logic [REQUESTERS-1:0]				          r_aready;
-// logic [REQUESTERS-1:0][ADDR_WIDTH-1:0]  w_addr;
-// logic [REQUESTERS-1:0][DATA_WIDTH-1:0]  w_data;
-// logic [REQUESTERS-1:0]  			          w_valid;
-// logic [REQUESTERS-1:0]				          w_ready;
 
 multimemory
 #(
@@ -180,6 +147,7 @@ generate
 
       //r_avalid[0]  <= #1 '0;
       u[ii].r_avalid  <= #1 '0;
+      u[ii].r_addr   <= #1 '0;
 
       while(1) begin
           while(1) begin
@@ -224,6 +192,62 @@ generate
   end
 endgenerate
 
+
+generate
+  for( ii=0; ii<REQUESTERS; ii++ ) begin
+
+    initial begin
+
+      //r_avalid[0]  <= #1 '0;
+      u[ii].w_valid  <= #1 '0;
+      u[ii].w_addr   <= #1 '0;
+      u[ii].w_data   <= #1 '0;
+
+      while(1) begin
+          while(1) begin
+           //@(posedge clk iff(qa_transaction_drive_rd[ii].size()>0));
+           if( qa_transaction_drive_wr[ii].size()>0 ) 
+              break;
+            else
+              #1;
+          end
+
+          current_drive_wr[ii] = qa_transaction_drive_wr[ii].pop_front();
+
+          if( 3==current_drive_wr[ii].op ) 
+            break;
+          if( 2==current_drive_wr[ii].op ) begin
+              @(posedge clk iff tick_current==current_drive_wr[ii].sync_tick );
+              continue;
+          end
+          u[ii].w_addr   <= #1 current_drive_wr[ii].addr;
+          u[ii].w_data   <= #1 current_drive_wr[ii].data;
+          u[ii].w_valid <= #1 '1;
+
+          // r_addr[0]  <= #1 current_drive_rd_0.addr;
+          // r_avalid[0]  <= #1 '1;
+
+          @(posedge clk iff u[ii].w_ready & u[ii].w_valid);
+
+          if( current_drive_wr[ii].delay>0 ) begin
+            //r_avalid[0]  <= #1 '0;
+            u[ii].w_valid  <= #1 '0;
+            u[ii].w_addr   <= #1 '0;
+            u[ii].w_data   <= #1 '0;
+            repeat(current_drive_wr[ii].delay) @(posedge clk);
+          end else if( qa_transaction_drive_wr[ii].size()==0) begin
+            u[ii].w_valid  <= #1 '0;
+            u[ii].w_addr   <= #1 '0;
+            u[ii].w_data   <= #1 '0;
+            @(posedge clk iff(qa_transaction_drive_wr[ii].size()>0));
+          end
+          //current_drive_rd_0 = null;
+      end
+
+    end
+
+  end
+endgenerate
 
 // // Monitor
 generate
@@ -299,8 +323,8 @@ task read_data;
   input int     delay;
 begin
 
-  //type_transaction_rd tr_rd  = new( addr, delay );
-  automatic type_transaction_rd tr_rd;
+  //type_transaction tr_rd  = new( addr, delay );
+  automatic type_transaction tr_rd;
     tr_rd.addr      = addr;
     tr_rd.delay     = delay;
     tr_rd.op        = 1;
@@ -331,6 +355,27 @@ task write_data;
   input int     delay;
 begin
 
+ 
+  automatic type_transaction tr_wr;
+    tr_wr.addr      = addr;
+    tr_wr.data      = data;
+    tr_wr.delay     = delay;
+    tr_wr.op        = 4;
+    tr_wr.sync_tick = 0;
+
+  if( qn & 1 )  begin 
+        qa_transaction_drive_wr[0].push_back(tr_wr);
+  end
+  
+  if( qn & 2 )  begin 
+        qa_transaction_drive_wr[1].push_back(tr_wr);
+  end
+
+  if( qn & 4 )  begin 
+        qa_transaction_drive_wr[2].push_back(tr_wr);
+  end
+  
+
 end endtask;
 
 
@@ -340,7 +385,7 @@ task sync;
   input int     sync_tick;
 begin
 
- automatic type_transaction_rd tr_rd;
+ automatic type_transaction tr_rd;
     tr_rd.addr      = 0;
     tr_rd.delay     = 0;
     tr_rd.op        = 2;
@@ -358,6 +403,20 @@ begin
         qa_transaction_drive_rd[2].push_back(tr_rd);
   end
 
+
+  if( qw & 1 )  begin 
+        qa_transaction_drive_wr[0].push_back(tr_rd);
+  end
+  
+  if( qw & 2 )  begin 
+        qa_transaction_drive_wr[1].push_back(tr_rd);
+  end
+
+  if( qw & 4 )  begin 
+        qa_transaction_drive_wr[2].push_back(tr_rd);
+  end
+
+
 end endtask;
 
 task q_end;
@@ -365,7 +424,7 @@ task q_end;
   input int     qw;
 begin
 
- automatic type_transaction_rd tr_rd;
+ automatic type_transaction tr_rd;
     tr_rd.addr      = 0;
     tr_rd.delay     = 0;
     tr_rd.op        = 3;
@@ -394,8 +453,22 @@ begin
       read_data( 1, 16'h0010, 2 );
       read_data( 1, 16'h0011, 2 );
       read_data( 1, 16'h0012, 2 );
-      write_data( 1, 16'h0212, 16'hA012, 1 );
-      sync( 1, 0, 'h40 );
+
+
+      sync( 1, 1, 'h90 );
+      write_data( 1, 16'h0219, 16'hA019, 1 );
+
+      sync( 1, 1, 'hC0 );
+      write_data( 1, 16'h0220, 16'hA020, 1 );
+      read_data( 1, 16'h0220, 0 );
+      read_data( 1, 16'h0220, 0 );
+      read_data( 1, 16'h0220, 0 );
+      read_data( 1, 16'h0220, 0 );
+      read_data( 1, 16'h0220, 0 );
+      read_data( 1, 16'h0220, 0 );
+      read_data( 1, 16'h0220, 0 );
+      read_data( 1, 16'h0220, 1 );
+
       q_end( 1, 1 );
 
 end endtask;
@@ -412,6 +485,42 @@ begin
        read_data( 2, 16'h0115, 0 );
        read_data( 2, 16'h0116, 0 );
        read_data( 2, 16'h0117, 1 );
+
+      sync( 2, 2, 'hC0 );      
+      read_data( 2, 16'h0220, 0 );
+      read_data( 2, 16'h0220, 0 );
+      read_data( 2, 16'h0220, 0 );
+      read_data( 2, 16'h0220, 0 );
+      read_data( 2, 16'h0220, 0 );
+      read_data( 2, 16'h0220, 0 );
+      read_data( 2, 16'h0220, 1 );
+
+
+      sync( 0, 2, 'hE0 );      
+      write_data( 2, 16'h0120, 16'hA120, 0 );
+      write_data( 2, 16'h0121, 16'hA121, 0 );
+      write_data( 2, 16'h0122, 16'hA122, 0 );
+      write_data( 2, 16'h0123, 16'hA123, 0 );
+      write_data( 2, 16'h0124, 16'hA124, 0 );
+      write_data( 2, 16'h0125, 16'hA125, 0 );
+      write_data( 2, 16'h0126, 16'hA126, 0 );
+      write_data( 2, 16'h0127, 16'hA127, 0 );
+      write_data( 2, 16'h0128, 16'hA128, 0 );
+      write_data( 2, 16'h0129, 16'hA129, 0 );
+      write_data( 2, 16'h012A, 16'hA12A, 1 );
+
+      sync( 2, 0, 'hE4 );      
+      read_data( 2, 16'h0120, 0 );
+      read_data( 2, 16'h0121, 0 );
+      read_data( 2, 16'h0122, 0 );
+      read_data( 2, 16'h0123, 0 );
+      read_data( 2, 16'h0124, 0 );
+      read_data( 2, 16'h0125, 0 );
+      read_data( 2, 16'h0126, 0 );
+      read_data( 2, 16'h0127, 0 );
+      read_data( 2, 16'h0128, 0 );
+      read_data( 2, 16'h0129, 0 );
+      read_data( 2, 16'h012A, 1 );
 
        q_end( 2, 2 );
 
@@ -431,6 +540,21 @@ begin
 
       sync( 4, 0, 'h80 );      
       read_data( 4, 16'h0219, 4 );
+
+      sync( 4, 0, 'hA0 );      
+      read_data( 4, 16'h0219, 4 );
+
+      sync( 4, 4, 'hC0 );      
+      write_data( 4, 16'h0220, 16'hA220, 1 );
+      read_data( 4, 16'h0220, 0 );
+      read_data( 4, 16'h0220, 0 );
+      read_data( 4, 16'h0220, 0 );
+      read_data( 4, 16'h0220, 0 );
+      read_data( 4, 16'h0220, 0 );
+      read_data( 4, 16'h0220, 0 );
+      read_data( 4, 16'h0220, 0 );
+      read_data( 4, 16'h0220, 1 );
+
 
       q_end( 4, 4 );
 

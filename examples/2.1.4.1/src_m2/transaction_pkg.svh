@@ -7,23 +7,23 @@ localparam  DATA_WIDTH = 16;
 localparam  ADDR_WIDTH = 16;
 
 
+//typedef struct
+//{
+//    logic   [15:0]      addr;
+//    logic   [15:0]     	data;
+//    int 		       	delay;
+//
+//} type_transaction_wr;
+
 typedef struct
 {
     logic   [15:0]      addr;
     logic   [15:0]     	data;
     int 		       	delay;
-
-} type_transaction_wr;
-
-typedef struct
-{
-    logic   [15:0]      addr;
-    logic   [15:0]     	data;
-    int 		       	delay;
-    int                 op; // 1 - read, 2 - sync, 3 - exit
+    int                 op; // 1 - read, 2 - sync, 3 - exit, 4 - write
     int                 sync_tick;
 
-} type_transaction_rd;
+} type_transaction;
 
 typedef struct
 {

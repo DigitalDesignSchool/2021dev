@@ -30,8 +30,10 @@ module pseudo_dual_port_memory
   reg [DATA_WIDTH-1:0] memory [ADDR_MAX-1:0];
 
   // Write data to memory
-  always @(posedge clk)
-    memory[w_addr] <= #1 w_data;
+  always @(posedge clk) begin
+    if( w_valid )
+      memory[w_addr] <= #1 w_data;
+  end
 
   // Read data from memory with latency
   reg 			   r_dvalid_shift [DATA_LAT];

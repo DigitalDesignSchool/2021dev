@@ -74,49 +74,84 @@ module multimemory
   reg [REQUESTERS-1:0] sync_r_aready;
   reg [REQUESTERS-1:0] sync_w_ready;
 
-  always @(posedge clk) begin
+  // always @(posedge clk) begin
 
-    mem_r_addr  <= #1 '0;
-    mem_r_avalid <= #1 '0;
-    // mem_w_addr  <= #1 '0;
-    // mem_w_data  <= #1 '0;
-    // mem_w_valid <= #1 '0;
+  //   mem_r_addr  <= #1 '0;
+  //   mem_r_avalid <= #1 '0;
+  //   // mem_w_addr  <= #1 '0;
+  //   // mem_w_data  <= #1 '0;
+  //   // mem_w_valid <= #1 '0;
 
-    if (rst) begin
-      mem_r_addr  <= #1 '0;
-      mem_r_avalid <= #1 '0;
-      // mem_w_addr  <= #1 '0;
-      // mem_w_data  <= #1 '0;
-      // mem_w_valid <= #1 '0;
+  //   if (rst) begin
+  //     mem_r_addr  <= #1 '0;
+  //     mem_r_avalid <= #1 '0;
+  //     // mem_w_addr  <= #1 '0;
+  //     // mem_w_data  <= #1 '0;
+  //     // mem_w_valid <= #1 '0;
 
-    end else begin
+  //   end else begin
 
-      // Put
-      for (int r = 0; r < REQUESTERS; r++) begin
+  //     // Put
+  //     for (int r = 0; r < REQUESTERS; r++) begin
 
-        if(r_aready[r]=='1 && r_avalid[r]=='1 ) begin
-          mem_r_addr  <= #1 r_addr[r];
-          mem_r_avalid <= #1 '1;
-          r_dvalid_shift[0][r] <= #1 '1;
-        end else begin
-          r_dvalid_shift[0][r] <= #1 '0;
+  //       if(r_aready[r]=='1 && r_avalid[r]=='1 ) begin
+  //         mem_r_addr  <= #1 r_addr[r];
+  //         mem_r_avalid <= #1 '1;
+  //         r_dvalid_shift[0][r] <= #1 '1;
+  //       end else begin
+  //         r_dvalid_shift[0][r] <= #1 '0;
+  //       end
+
+  //       // if(w_ready[r]=='1 && w_valid[r]=='1 )  begin
+  //       //   mem_w_addr  <= #1 w_addr[r];
+  //       //   mem_w_data  <= #1 w_data[r];
+  //       //   mem_w_valid <= #1 '1;
+  //       // end 
+  //     end
+
+  //     // Shift
+  //     if (rst) begin
+  //       r_dvalid_shift <= #1 '{DATA_LAT{0}};
+  //     end else begin
+  //       for (int i = 1; i < DATA_LAT; i++)
+  //         r_dvalid_shift[i] <= #1 r_dvalid_shift[i - 1];
+  //     end
+  //   end
+  // end
+
+  logic  [ADDR_WIDTH-1:0]         n_r_addr;
+  logic                           n_mem_r_avalid;
+  logic   [REQUESTERS-1:0]        n_r_dvalid_shift;
+  always_comb begin
+
+    n_r_addr = '0;
+    n_mem_r_avalid = '0;
+    n_r_dvalid_shift = '0;
+
+    for( int ii=0; ii<REQUESTERS; ii++ ) begin
+        if( r_aready[ii]=='1 && r_avalid[ii]=='1  ) begin
+            n_r_addr        = r_addr[ii];
+            n_mem_r_avalid  = '1;
+            n_r_dvalid_shift[ii] = '1;
         end
+    end
+  end
 
-        // if(w_ready[r]=='1 && w_valid[r]=='1 )  begin
-        //   mem_w_addr  <= #1 w_addr[r];
-        //   mem_w_data  <= #1 w_data[r];
-        //   mem_w_valid <= #1 '1;
-        // end 
-      end
-
-      // Shift
+  always @(posedge clk) begin
+    // Shift
       if (rst) begin
         r_dvalid_shift <= #1 '{DATA_LAT{0}};
       end else begin
         for (int i = 1; i < DATA_LAT; i++)
           r_dvalid_shift[i] <= #1 r_dvalid_shift[i - 1];
+
+        r_dvalid_shift[0] <= n_r_dvalid_shift;
+
+        mem_r_addr  <=  #1  n_r_addr;
+        mem_r_avalid <= #1  n_mem_r_avalid;
+
       end
-    end
+  
   end
   
   assign r_aready = r_grant;
@@ -134,6 +169,7 @@ module multimemory
           mem_w_addr  <= w_addr[ii];
           mem_w_data  <= w_data[ii];
           mem_w_valid <= w_valid[ii];
+          break;
       end
     end
 

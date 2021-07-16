@@ -56,6 +56,8 @@ logic               test_timeout=0;
 logic               test_done=0;
 int                 out_ready_cnt=0;
 
+int                 randomize_loop=100;
+
 golden_memory_t     golden_memory;
 int                 tick_current=0;
 
@@ -560,6 +562,78 @@ begin
 
 end endtask;
 
+class randomize_full_t;
+  rand int op;
+  rand int port_mask;
+  rand int addr;
+  rand int data;
+  rand int delay;
+
+  function string str ();
+    string s;
+    if( 0==op )
+      $sformat( s, "op: read   addr: %h  delay:%-d", addr, delay );
+    else
+      $sformat( s, "op: write  addr: %h  delay:%-d   data: %h"  , addr, delay, data );
+
+    return s;  
+  endfunction;
+
+  constraint op_c
+  {
+    op inside { 0, 1};
+  }
+
+  constraint port_mask_c
+  {
+    port_mask inside { 1, 2, 4 };
+  }
+
+  constraint addr_c
+  {
+    //adr[7:0] == 'h00;
+
+    addr dist
+    {
+      [             0 :     16'h3FFF ] := 25,
+      [      16'h4000 :     16'h7FFF ] :/ 25,
+      [      16'h8000 :     16'hBFFF ] :/ 25,
+      [      16'hC000 :     16'hFFFF ] :/ 25
+    }; 
+  }
+
+  constraint delay_c
+  {
+    //adr[7:0] == 'h00;
+
+    delay dist
+    {
+      [             1 :     2  ] := 50,
+      [             3 :     7  ] :/ 25,
+      [             7 :     16 ] :/ 25
+    }; 
+  }
+
+
+endclass;
+
+task test_randomize;
+begin
+    
+    randomize_full_t r = new;
+    for( int ii=0; ii<randomize_loop; ii++ ) begin
+      assert( r.randomize() );
+      if( 0==r.op )
+        read_data( r.port_mask, r.addr, r.delay );
+      else
+        write_data( r.port_mask, r.addr, r.data, r.delay );
+
+      if( ii<16 )
+        $display("%s", r.str() );
+
+    end
+    q_end( 7, 7 );
+end endtask; 
 
 // Generate test sequence 
 initial begin
@@ -584,6 +658,7 @@ initial begin
   end
   1: begin
       $display("Test 1: %s", test_name[1]);
+      test_randomize();
   end
   endcase
 

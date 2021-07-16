@@ -78,16 +78,16 @@ module multimemory
 
     mem_r_addr  <= #1 '0;
     mem_r_avalid <= #1 '0;
-    mem_w_addr  <= #1 '0;
-    mem_w_data  <= #1 '0;
-    mem_w_valid <= #1 '0;
+    // mem_w_addr  <= #1 '0;
+    // mem_w_data  <= #1 '0;
+    // mem_w_valid <= #1 '0;
 
     if (rst) begin
       mem_r_addr  <= #1 '0;
       mem_r_avalid <= #1 '0;
-      mem_w_addr  <= #1 '0;
-      mem_w_data  <= #1 '0;
-      mem_w_valid <= #1 '0;
+      // mem_w_addr  <= #1 '0;
+      // mem_w_data  <= #1 '0;
+      // mem_w_valid <= #1 '0;
 
     end else begin
 
@@ -102,11 +102,11 @@ module multimemory
           r_dvalid_shift[0][r] <= #1 '0;
         end
 
-        if(w_ready[r]=='1 && w_valid[r]=='1 )  begin
-          mem_w_addr  <= #1 w_addr[r];
-          mem_w_data  <= #1 w_data[r];
-          mem_w_valid <= #1 '1;
-        end 
+        // if(w_ready[r]=='1 && w_valid[r]=='1 )  begin
+        //   mem_w_addr  <= #1 w_addr[r];
+        //   mem_w_data  <= #1 w_data[r];
+        //   mem_w_valid <= #1 '1;
+        // end 
       end
 
       // Shift
@@ -123,6 +123,21 @@ module multimemory
   assign w_ready  = w_grant;
   assign r_dvalid = r_dvalid_shift[DATA_LAT-1];
   
+  always_comb begin
+
+    mem_w_addr  <= '0;
+    mem_w_data  <= '0;
+    mem_w_valid <= '0;
+
+    for( int ii=0; ii<REQUESTERS; ii++ ) begin
+      if( 1==w_grant[ii] ) begin
+          mem_w_addr  <= w_addr[ii];
+          mem_w_data  <= w_data[ii];
+          mem_w_valid <= w_valid[ii];
+      end
+    end
+
+  end
   // connect all requesters to the data wire
   genvar i; generate
     for (i=0; i<REQUESTERS; i=i+1)

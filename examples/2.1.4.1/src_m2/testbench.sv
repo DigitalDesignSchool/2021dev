@@ -56,7 +56,7 @@ logic               test_timeout=0;
 logic               test_done=0;
 int                 out_ready_cnt=0;
 
-int                 randomize_loop=100;
+int                 randomize_loop=1000;
 
 golden_memory_t     golden_memory;
 int                 tick_current=0;

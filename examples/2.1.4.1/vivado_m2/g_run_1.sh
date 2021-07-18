@@ -1,1 +1,1 @@
-xsim -gui tb_behav --view ./wave.wcfg --view ./uut.wcfg --testplusarg test_id=1 
+xsim -gui tb_behav --view ./wave.wcfg --view ./uut.wcfg --view ./memory.wcfg --testplusarg test_id=1 

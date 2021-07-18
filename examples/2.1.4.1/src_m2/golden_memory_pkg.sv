@@ -89,8 +89,8 @@ mask_avaliable[2*REQUESTERS-1:0] = '0;
 		if( ii==port_tick_max )
 			continue;
 
-		if( (tick_max-m.tick_curr[ii]) < 6 ) begin
-			mask_avaliable[ii] = '1; // first value;
+		if( (tick_max-m.tick_curr[ii]) < 16 ) begin
+			mask_avaliable[ii] = '1; // value at the same time in the another ports;
 			data[ii] = m.data_curr[ii];
 		end 
 	end
@@ -98,8 +98,8 @@ mask_avaliable[2*REQUESTERS-1:0] = '0;
 	// compare time for write data and time for read data
 	for( int ii=0; ii<REQUESTERS; ii++ ) begin
 
-		if( tick_current-m.tick_curr[ii] < 6 ) begin
-			mask_avaliable[REQUESTERS+ii] = '1; // first value;
+		if( tick_current-m.tick_curr[ii] < 16 ) begin
+			mask_avaliable[REQUESTERS+ii] = '1; // value for previouse value for all ports ;
 			data[REQUESTERS+ii] = m.data_last[ii];
 		end 
 	end

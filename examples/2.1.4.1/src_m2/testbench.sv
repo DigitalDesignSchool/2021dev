@@ -4,8 +4,7 @@
 `default_nettype none
 
 `include "transaction_pkg.svh"
-//`include "global_memory_pkg.svh"
-`include "golden_memory_pkg.svh"
+`include "golden_memory_pkg.sv"
 
 import transaction_pkg::*;
 import golden_memory_pkg::*;

@@ -65,6 +65,7 @@ function get_data(
 
 );
 
+int flag;
 int tick_max=0;
 int port_tick_max=0;
 
@@ -95,15 +96,42 @@ mask_avaliable[2*REQUESTERS-1:0] = '0;
 		end 
 	end
 
+	// // compare time for write data and time for read data
+	// for( int ii=0; ii<REQUESTERS; ii++ ) begin
+
+	// 	if( tick_current-m.tick_curr[ii] < 16 ) begin
+	// 		mask_avaliable[REQUESTERS+ii] = '1; // value for previouse value for all ports ;
+	// 		data[REQUESTERS+ii] = m.data_last[ii];
+	// 	end 
+	// end
+
 	// compare time for write data and time for read data
+	flag=0;
 	for( int ii=0; ii<REQUESTERS; ii++ ) begin
 
 		if( tick_current-m.tick_curr[ii] < 16 ) begin
-			mask_avaliable[REQUESTERS+ii] = '1; // value for previouse value for all ports ;
-			data[REQUESTERS+ii] = m.data_last[ii];
+			flag=1;
 		end 
 	end
 
+	if( flag ) begin
+
+		for( int ii=0; ii<REQUESTERS; ii++ ) begin
+			mask_avaliable[ii] = '1; // value for previouse value for all ports ;
+			data[ii] = m.data_curr[ii];
+
+			mask_avaliable[REQUESTERS+ii] = '1; // value for previouse value for all ports ;
+			data[REQUESTERS+ii] = m.data_last[ii];
+
+		end
+
+		// for( int ii=0; ii<REQUESTERS; ii++ ) begin
+		// 	if( tick_current-m.tick_last[ii] < 16 ) begin
+		// 		mask_avaliable[REQUESTERS+ii] = '1; // value for previouse value for all ports ;
+		// 		data[REQUESTERS+ii] = m.data_last[ii];
+		// 	end
+		// end
+	end
 
 endfunction
 

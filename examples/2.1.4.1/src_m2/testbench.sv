@@ -3,7 +3,7 @@
 
 `default_nettype none
 
-`include "transaction_pkg.svh"
+`include "transaction_pkg.sv"
 `include "golden_memory_pkg.sv"
 
 import transaction_pkg::*;
@@ -48,6 +48,9 @@ int                 cnt_wr=0;
 int                 cnt_rd=0;
 int                 cnt_ok=0;  
 int                 cnt_error=0;
+
+int                 show_ok=0;
+int                 show_error=0;
 
 int                 test_id=0;
 logic               test_start=0;
@@ -165,6 +168,8 @@ generate
             break;
           if( 2==current_drive_rd[ii].op ) begin
               @(posedge clk iff tick_current==current_drive_rd[ii].sync_tick );
+              show_ok=0;
+              show_error=0;
               continue;
           end
           u[ii].r_addr   <= #1 current_drive_rd[ii].addr;
@@ -264,7 +269,7 @@ generate
       end else begin
 
           current_check_rd[ii] = qa_transaction_check_rd[ii].pop_front();
-          $display("current_check_rd[%d] addr: %h ", ii, current_check_rd[ii].addr );
+          //$display("current_check_rd[%-d] addr: %h ", ii, current_check_rd[ii].addr );
           golden_memory.get_data( tick_current, ii, current_check_rd[ii].addr, 
             mask_avaliable[ii], expect_data[ii]
           );
@@ -279,27 +284,29 @@ generate
           end
 
           if( 1==flag_eq[ii] ) begin
-              if( cnt_ok<16 ) begin
-                 $display("Read: ok: %-d error: %-d  port: %d  adr=%h read: %h mask_avaliable: %h  - Ok",
-                  cnt_ok, cnt_error, ii, current_check_rd[ii].addr, u[ii].r_data, mask_avaliable[ii]
+              if( show_ok<16 ) begin
+                 $display("Read: ok: %-d error: %-d  port: %d  adr=%h read: %h mask_avaliable: %h  tick: %h - Ok",
+                  cnt_ok, cnt_error, ii, current_check_rd[ii].addr, u[ii].r_data, mask_avaliable[ii], tick_current
                  ); 
                  for( int jj=0; jj<2*REQUESTERS; jj++) begin
                     if( mask_avaliable[ii][jj] )  
                         $display( "   expect data: %h", expect_data[ii][jj] );
                     
                 end 
+                show_ok++;
               end
               cnt_ok++;
           end else begin
-              if( cnt_error<16 ) begin
-                 $display("Read: ok: %-d error: %-d  port: %d adr: %h read: %h  mask_avaliable: %h - Error",
-                    cnt_ok, cnt_error, ii, current_check_rd[ii].addr, u[ii].r_data, mask_avaliable[ii]
+              if(  show_error<16 ) begin
+                 $display("Read: ok: %-d error: %-d  port: %d adr: %h read: %h  mask_avaliable: %h  tick: %h - Error",
+                    cnt_ok, cnt_error, ii, current_check_rd[ii].addr, u[ii].r_data, mask_avaliable[ii], tick_current
                  );
                  for( int jj=0; jj<2*REQUESTERS; jj++) begin
                     if( mask_avaliable[ii][jj] )  
                         $display( "   expect data: %h", expect_data[ii][jj] );
                     
-                end 
+                end
+                show_error++; 
               end
               cnt_error++;
           end
@@ -470,6 +477,13 @@ begin
       read_data( 1, 16'h0220, 0 );
       read_data( 1, 16'h0220, 1 );
 
+      sync( 1, 1, 'h100 );
+      write_data( 1, 16'h0400, 16'hB010, 1 );
+      sync( 1, 1, 'h104 );
+      read_data( 1, 16'h0400, 0 );
+      read_data( 1, 16'h0400, 0 );
+      read_data( 1, 16'h0400, 1 );
+
       q_end( 1, 1 );
 
 end endtask;
@@ -523,6 +537,22 @@ begin
       read_data( 2, 16'h0129, 0 );
       read_data( 2, 16'h012A, 1 );
 
+      sync( 2, 2, 'h100 );
+      write_data( 1, 16'h0400, 16'hC020, 1 );
+      sync( 2, 2, 'h105 );
+      read_data( 2, 16'h0400, 0 );
+      read_data( 2, 16'h0400, 0 );
+      read_data( 2, 16'h0400, 1 );
+
+      sync( 0, 2, 'h120 );
+      write_data( 2, 16'h0400, 16'hC0E0, 1 );
+      write_data( 2, 16'h0400, 16'hC0E1, 1 );
+      sync( 2, 0, 'h128 );
+      read_data( 2, 16'h0400, 0 );
+      read_data( 2, 16'h0400, 0 );
+      read_data( 2, 16'h0400, 1 );
+
+
        q_end( 2, 2 );
 
 end endtask;
@@ -555,6 +585,14 @@ begin
       read_data( 4, 16'h0220, 0 );
       read_data( 4, 16'h0220, 0 );
       read_data( 4, 16'h0220, 1 );
+
+      sync( 0, 4, 'h11F );
+      write_data( 4, 16'h0400, 16'hD0E0, 1 );
+      write_data( 4, 16'h0400, 16'hD0E1, 1 );
+      sync( 4, 0, 'h126 );
+      read_data( 4, 16'h0400, 0 );
+      read_data( 4, 16'h0400, 0 );
+      read_data( 4, 16'h0400, 1 );
 
 
       q_end( 4, 4 );

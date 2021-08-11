@@ -109,7 +109,7 @@ begin
   automatic int               pause;
 
   //while(1) begin
-    for( int jj=0; jj<500; jj++ ) begin
+    for( int jj=0; jj<5000; jj++ ) begin
 
       pause = $urandom_range( 0, 3 );
 
@@ -228,12 +228,174 @@ initial begin
             write_data( "0123", 0 );
             write_data( "4567", 0 );
             write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
             write_data( "0123", 0 );
             write_data( "4567", 0 );
             write_data( "89ab", 1 );
 
             #500;
 
+            set_outready_cnt( 4 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
+
+            #500;
+
+            set_outready_cnt( 5 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
+
+            #500;
+
+            set_outready_cnt( 6 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            set_outready_cnt( 2 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 0 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
+            write_data( "0123", 0 );
+            write_data( "4567", 0 );
+            write_data( "89ab", 1 );
+
+            #500;                        
             test_done=1;
 
 
@@ -251,7 +413,7 @@ initial begin
 end 
 
 initial begin
-    #100000;
+    #200000;
     $display( "Timeout");
     test_timeout = '1;
 end

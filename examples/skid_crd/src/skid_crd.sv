@@ -20,7 +20,8 @@ module skid_crd
 
 
 logic [1:0]         state; // 10 - empty, 11 - half, 01 - full
-logic [nb-1:0]      buf_tdata;
+logic [nb-1:0]      buf_tdata[2];
+logic               rd_pos;
 
 logic [nb-1:0]      reg_tdata;
 
@@ -28,18 +29,18 @@ logic               is_write;
 logic               is_read;
 
 logic               is_write_z;
-logic  [1:0]        crd_cnt;
+logic  [2:0]        crd_cnt;
 
 assign  is_write    = in_tvalid & in_tready;
 assign  is_read     = out_tvalid & out_tready;
 
-assign in_tready    = crd_cnt[1];
+assign in_tready    = crd_cnt[2];
 assign out_tvalid   = state[0];
 
 always_ff @(posedge aclk) begin
 
     if( ~aresetn )
-        crd_cnt <= #1 2'b11;
+        crd_cnt <= #1 3'b110;    // 011 100 101 110
     else 
             case( {is_write, is_read })
                 2'b01: begin  // read
@@ -62,8 +63,10 @@ always_ff @(posedge aclk) begin
 
     reg_tdata <= #1 in_tdata;
 
-    if( is_write_z )
-        buf_tdata <= #1 reg_tdata;
+    if( is_write_z ) begin
+        buf_tdata[0] <= #1 reg_tdata;
+        buf_tdata[1] <= #1 buf_tdata[0];
+    end
 
     case( state )
         2'b10: begin // empty: in_tready=1, out_tvalid=0
@@ -71,6 +74,7 @@ always_ff @(posedge aclk) begin
             if( is_write_z ) begin
                 state <= #1 2'b11;
             end
+            rd_pos <= #1 '0;
         end
 
         2'b11: begin // half: in_tready=1, out_tvalid=1
@@ -91,10 +95,27 @@ always_ff @(posedge aclk) begin
         end
 
         2'b01: begin    // full: in_tready=0, out_tvalid=1
-               if( is_read ) begin
-                   state <= #1 2'b11;
-                   out_tdata <= #1 buf_tdata;
-               end 
+
+            case( {is_write_z, is_read })
+                2'b01: begin  // read
+                   if( ~rd_pos ) begin
+                        state <= #1 2'b11;
+                        out_tdata <= #1 buf_tdata[0];
+                   end else begin
+                        out_tdata <= #1 buf_tdata[1];
+                        rd_pos <= #1 '0;
+                   end
+                end
+
+                2'b10: begin   // write
+                        rd_pos <= #1 '1;
+                end
+
+                2'b11: begin   // write & read
+                    out_tdata <= #1 buf_tdata[rd_pos];
+                end
+            endcase
+
         end
 
     endcase

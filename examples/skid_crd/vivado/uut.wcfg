@@ -10,15 +10,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="669.700 ns"></ZoomStartTime>
-      <ZoomEndTime time="842.501 ns"></ZoomEndTime>
-      <Cursor1Time time="738.300 ns"></Cursor1Time>
+      <ZoomStartTime time="1,191.400 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,365.001 ns"></ZoomEndTime>
+      <Cursor1Time time="1,336.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="282"></NameColumnWidth>
-      <ValueColumnWidth column_width="130"></ValueColumnWidth>
+      <ValueColumnWidth column_width="126"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="18" />
+   <WVObjectSize size="19" />
    <wvobject type="logic" fp_name="/tb/uut/aclk">
       <obj_property name="ElementShortName">aclk</obj_property>
       <obj_property name="ObjectShortName">aclk</obj_property>
@@ -56,8 +56,12 @@
       <obj_property name="ObjectShortName">state[1:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/tb/uut/buf_tdata">
-      <obj_property name="ElementShortName">buf_tdata[31:0]</obj_property>
-      <obj_property name="ObjectShortName">buf_tdata[31:0]</obj_property>
+      <obj_property name="ElementShortName">buf_tdata[0:1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">buf_tdata[0:1][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/uut/rd_pos">
+      <obj_property name="ElementShortName">rd_pos</obj_property>
+      <obj_property name="ObjectShortName">rd_pos</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/tb/uut/reg_tdata">
       <obj_property name="ElementShortName">reg_tdata[31:0]</obj_property>

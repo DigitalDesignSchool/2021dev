@@ -1,6 +1,6 @@
 // Code your testbench here
 // or browse Examples
-
+`timescale 1 ns / 1 ns
 `default_nettype none
 
 module tb

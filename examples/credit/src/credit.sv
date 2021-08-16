@@ -1,4 +1,5 @@
 // Code your design here
+`timescale 1 ns / 1 ns
 `default_nettype none 
 
 module credit
@@ -17,7 +18,7 @@ module credit
 
   output wire [15:0]        out_tdata,
   output wire               out_tvalid,
-  input  reg                out_tready
+  input  wire               out_tready
 );
 
 logic           fifo_rd;
@@ -45,7 +46,7 @@ assign is_read  = out_tvalid & out_tready;
 
 always @(posedge aclk)
     if( rstp )
-        crd_cnt <= 4'b1110;
+        crd_cnt <= 4'b1111;
     else
         case( {is_write, is_read})
             2'b01: crd_cnt <= #1 crd_cnt + 1; // read

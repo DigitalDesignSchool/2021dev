@@ -31,8 +31,8 @@ logic               fifo_full;
 logic               fifo_empty;
 logic               rstp;
 
-logic [5:0]         crd_cnt;
-logic [5:0]         n_crd_cnt;
+logic [6:0]         crd_cnt;
+logic [6:0]         n_crd_cnt;
 logic               is_write;
 logic               is_read;
 logic [3:0][3:0]    size_z;
@@ -46,7 +46,7 @@ assign fifo_rd = ~fifo_empty & out_tready;
 
 always @(posedge aclk) rstp <= #1 ~aresetn;
 
-assign in_tready = crd_cnt[5];
+assign in_tready = crd_cnt[6];
 
 assign is_write = in_tvalid & in_tready;
 assign is_read  = out_tvalid & out_tready;
@@ -54,7 +54,14 @@ assign is_read  = out_tvalid & out_tready;
 assign rd_b_addr = rd_a_data[7:0];
 assign rd_b_read = rd_a_valid;
 
+logic [4:0]     n_write;
+
 always_comb begin
+
+    if( 0==rd_a_data[11:8] )
+        n_write = 16;
+    else
+        n_write = rd_a_data[11:8];
 
     n_crd_cnt = crd_cnt;
 
@@ -65,7 +72,7 @@ always_comb begin
         n_crd_cnt = n_crd_cnt + 1;
 
     if( rd_a_valid )
-        n_crd_cnt = n_crd_cnt + (16-rd_a_data[11:8]);
+        n_crd_cnt = n_crd_cnt + (16-n_write);
 
 end
 
@@ -73,7 +80,7 @@ end
 
 always_ff @(posedge aclk)
     if( rstp )
-        crd_cnt <= #1 6'b111111;
+        crd_cnt <= #1 7'b1110000;
     else
         crd_cnt <= #1 n_crd_cnt;
 

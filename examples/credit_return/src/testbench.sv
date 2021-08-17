@@ -298,6 +298,12 @@ initial begin
 
         @(posedge aclk);
 
+        write_data( 8'h0F, 1 );
+        #500;
+
+        write_data( 8'h0E, 1 );
+        #500;
+
         write_data( 8'h00, 0 );
         write_data( 8'h01, 0 );
         write_data( 8'h02, 1 );

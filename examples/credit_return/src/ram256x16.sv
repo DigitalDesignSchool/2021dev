@@ -49,13 +49,15 @@ always @ (posedge clk) begin
 
     data_vld_z1 <= #1 data_vld_z0; 
     data_vld_z2 <= #1 data_vld_z1; 
-    data_o_vld  <= #1 data_vld_z2; 
+    //data_o_vld  <= #1 data_vld_z2; 
+    data_o_vld  <= #1 data_vld_z0; 
 
     data_z0 <= #1 mem[rd_addr];
 
     data_z1 <= #1 data_z0;
     data_z2 <= #1 data_z1;
-    data_o  <= #1 data_z2;
+    //data_o  <= #1 data_z2;
+    data_o  <= #1 data_z0;
 
 end
 

@@ -80,7 +80,7 @@ end
 
 always_ff @(posedge aclk)
     if( rstp )
-        crd_cnt <= #1 7'b1110000;
+        crd_cnt <= #1 7'b1101000;
     else
         crd_cnt <= #1 n_crd_cnt;
 

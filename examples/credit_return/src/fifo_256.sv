@@ -30,9 +30,9 @@ logic                       rstp;
 logic   [255:0]             data_z;     //! предыдущее значение data_i
 
 logic   [3:0]               start_word; //! текущая позиция записи в FIFO
-logic   [5:0]               cnt_wr;     //! счётчик записи
-logic   [5:0]               cnt_wr_z;   //! счётчик записи с задержкой на такт для компенсации цикла записи в память
-logic   [5:0]               cnt_rd;     //! счётчик чтения
+logic   [6:0]               cnt_wr;     //! счётчик записи
+logic   [6:0]               cnt_wr_z;   //! счётчик записи с задержкой на такт для компенсации цикла записи в память
+logic   [6:0]               cnt_rd;     //! счётчик чтения
 logic   [5:0]               word_cnt;   //! общее число слов в FIFO
 logic   [4:0]               last;       //! число слов оставшееся для записи в память с прошлого цикла
 logic   [3:0]               start_last; //! номер слова в регистре data_z с которого надо начинать запись
@@ -40,7 +40,7 @@ logic   [255:0]             w_data;     //! слово для записи в п
 logic   [15:0]              w_valid;    //! маска разрешения записи слова в память
 
 logic   [3:0]               n_start_word;
-logic   [5:0]               n_cnt_wr;
+logic   [6:0]               n_cnt_wr;
 logic   [5:0]               n_word_cnt;
 logic   [4:0]               n_last;
 logic   [3:0]               n_start_last;
@@ -149,13 +149,13 @@ always @(posedge clk) begin
 
 
     if( rstp ) begin
-        cnt_rd      <= # 8'b00;
+        cnt_rd      <= #1 '0;
     end 
 
 end
 
 
-assign  full    = (word_cnt>(256-16)) ? 1 : 0;
+assign  full    = (cnt_wr_z[5:0]==cnt_rd[5:0] && cnt_wr_z[6]!=cnt_rd[6]) ? 1 : 0;
 assign  empty   = (cnt_wr_z==cnt_rd) ? 1 : 0;
 
 assign  data_o  = mem[cnt_rd[5:4]][cnt_rd[3:0]*16+:16];

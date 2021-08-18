@@ -118,6 +118,8 @@ ram256x256   ram_b
 );
 
   
+bind credit_return   binding_coverage_credit_return   dut(.*); 
+
 credit_return   uut
 (
           .*
@@ -168,7 +170,9 @@ task write_data;
     in_tvalid <= #1 '1;
 
     data_a = golden_mem_a[data];
-    size = data_a[15:8];
+    size = data_a[11:8];
+    if( 0==size )
+        size = 16;
     addr = data_a[7:0];
     data_b = golden_mem_b[addr];
     for( int ii=0; ii<size; ii++ ) begin
@@ -192,15 +196,17 @@ endtask
 
 
 task write_seq;
+    input int   count;
+    input int   max_pause;
 begin
   automatic logic [7:0]         val;
   automatic int                 pause;
 
   //while(1) begin
-    for( int jj=0; jj<500; jj++ ) begin
+    for( int jj=0; jj<count; jj++ ) begin
 
-      pause = $urandom_range( 0, 3 );
-      val   = $urandom_range( 0, 31 );
+      pause = $urandom_range( 0, max_pause );
+      val   = $urandom_range( 0, 15 );
 
       write_data( val, pause );
     end 
@@ -208,7 +214,6 @@ begin
   //     break;
   // end
 
-  test_done=1;
 
 end endtask
 
@@ -227,8 +232,8 @@ begin
   automatic int cnt_low;
   while(1) begin
 
-    cnt_high = $urandom_range( 0, 24 );
-    cnt_low  = $urandom_range( 1, 32 );
+    cnt_high = $urandom_range( 0, 48 );
+    cnt_low  = $urandom_range( 1, 48 );
 
     @(posedge aclk iff out_tready);
 
@@ -301,6 +306,17 @@ initial begin
         write_data( 8'h0F, 1 );
         #500;
 
+        set_outready_cnt( 128 );
+        write_data( 8'h0F, 0 );
+        write_data( 8'h0F, 0 );
+        write_data( 8'h0F, 0 );
+        write_data( 8'h0F, 0 );
+        write_data( 8'h0F, 0 );
+        write_data( 8'h0F, 0 );
+        write_data( 8'h0F, 0 );
+        write_data( 8'h0F, 1 );
+        #500;
+
         write_data( 8'h0E, 1 );
         #500;
 
@@ -333,16 +349,27 @@ initial begin
   1: begin
       $display("Test 1: %s", test_name[1]);
       fork
-          write_seq();
+          begin
+              write_seq( 500, 8);
+              #500;
+              write_seq( 200, 1000);
+              #500;
+              write_seq( 100, 5000);
+              #500;
+              test_done=1;
+          end
+
           gen_out_tready();
       join
+      #500;
+
   end
   endcase
 
 end 
 
 initial begin
-    #100000;
+    #4000000;
     $display( "Timeout");
     test_timeout = '1;
 end
@@ -385,9 +412,9 @@ initial begin
   $display( "cnt_ok: %d", cnt_ok );
   $display( "cnt_error: %d", cnt_error );
 
-
-  // $display("overall coverage = %0f", $get_coverage());
-  // $display("coverage of covergroup cg = %0f", uut.cg.get_coverage());
+`ifdef COVERAGE
+   $display("overall coverage = %0f", $get_coverage());
+   $display("coverage of covergroup cg = %0f", uut.dut.cg.get_coverage());
   // $display("coverage of covergroup cg.in_tready = %0f", uut.cg.in_tready.get_coverage());
   // $display("coverage of covergroup cg.in_tvalid = %0f", uut.cg.in_tvalid.get_coverage());
   // $display("coverage of covergroup cg.out_tready = %0f", uut.cg.out_tready.get_coverage());
@@ -399,7 +426,7 @@ initial begin
 
   // $display("coverage of covergroup cg.o_rdy_transitions = %0f", uut.cg.o_rdy_transitions.get_coverage());
   
-
+`endif
   if( 0==cnt_error && cnt_ok>0 )
     test_finish( test_id, test_name[test_id], 1 );  // test passed
   else

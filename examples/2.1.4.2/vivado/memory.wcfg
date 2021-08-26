@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="golden_memory_pkg" />
+            <top_module name="tb" />
+            <top_module name="transaction_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="2589614fs"></ZoomEndTime>
+      <Cursor1Time time="2095000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="283"></NameColumnWidth>
+      <ValueColumnWidth column_width="82"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="15" />
+   <wvobject type="logic" fp_name="/tb/uut/memory/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/uut/memory/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/memory/r_addr">
+      <obj_property name="ElementShortName">r_addr[15:0]</obj_property>
+      <obj_property name="ObjectShortName">r_addr[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/uut/memory/r_avalid">
+      <obj_property name="ElementShortName">r_avalid</obj_property>
+      <obj_property name="ObjectShortName">r_avalid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/uut/memory/r_dvalid">
+      <obj_property name="ElementShortName">r_dvalid</obj_property>
+      <obj_property name="ObjectShortName">r_dvalid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/memory/r_data">
+      <obj_property name="ElementShortName">r_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">r_data[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/memory/w_addr">
+      <obj_property name="ElementShortName">w_addr[15:0]</obj_property>
+      <obj_property name="ObjectShortName">w_addr[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/memory/w_data">
+      <obj_property name="ElementShortName">w_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">w_data[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/uut/memory/w_valid">
+      <obj_property name="ElementShortName">w_valid</obj_property>
+      <obj_property name="ObjectShortName">w_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/memory/r_dvalid_shift">
+      <obj_property name="ElementShortName">r_dvalid_shift[0:0]</obj_property>
+      <obj_property name="ObjectShortName">r_dvalid_shift[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/memory/r_data_shift">
+      <obj_property name="ElementShortName">r_data_shift[0:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">r_data_shift[0:0][15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/memory/DATA_WIDTH">
+      <obj_property name="ElementShortName">DATA_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">DATA_WIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/memory/ADDR_WIDTH">
+      <obj_property name="ElementShortName">ADDR_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ADDR_WIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/memory/DATA_LAT">
+      <obj_property name="ElementShortName">DATA_LAT[31:0]</obj_property>
+      <obj_property name="ObjectShortName">DATA_LAT[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/memory/ADDR_MAX">
+      <obj_property name="ElementShortName">ADDR_MAX[15:0]</obj_property>
+      <obj_property name="ObjectShortName">ADDR_MAX[15:0]</obj_property>
+   </wvobject>
+</wave_config>

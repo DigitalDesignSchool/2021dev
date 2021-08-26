@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="golden_memory_pkg" />
+            <top_module name="tb" />
+            <top_module name="transaction_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="212442fs"></ZoomStartTime>
+      <ZoomEndTime time="393043fs"></ZoomEndTime>
+      <Cursor1Time time="255000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="283"></NameColumnWidth>
+      <ValueColumnWidth column_width="90"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="44" />
+   <wvobject type="logic" fp_name="/tb/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/cnt_wr">
+      <obj_property name="ElementShortName">cnt_wr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">cnt_wr[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/cnt_rd">
+      <obj_property name="ElementShortName">cnt_rd[31:0]</obj_property>
+      <obj_property name="ObjectShortName">cnt_rd[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/cnt_ok">
+      <obj_property name="ElementShortName">cnt_ok[31:0]</obj_property>
+      <obj_property name="ObjectShortName">cnt_ok[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/cnt_error">
+      <obj_property name="ElementShortName">cnt_error[31:0]</obj_property>
+      <obj_property name="ObjectShortName">cnt_error[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/test_id">
+      <obj_property name="ElementShortName">test_id[31:0]</obj_property>
+      <obj_property name="ObjectShortName">test_id[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/test_start">
+      <obj_property name="ElementShortName">test_start</obj_property>
+      <obj_property name="ObjectShortName">test_start</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/test_timeout">
+      <obj_property name="ElementShortName">test_timeout</obj_property>
+      <obj_property name="ObjectShortName">test_timeout</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/test_done">
+      <obj_property name="ElementShortName">test_done</obj_property>
+      <obj_property name="ObjectShortName">test_done</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/out_ready_cnt">
+      <obj_property name="ElementShortName">out_ready_cnt[31:0]</obj_property>
+      <obj_property name="ObjectShortName">out_ready_cnt[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/tick_current">
+      <obj_property name="ElementShortName">tick_current[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tick_current[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/current_drive_rd">
+      <obj_property name="ElementShortName">current_drive_rd[2:0]</obj_property>
+      <obj_property name="ObjectShortName">current_drive_rd[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/current_check_rd">
+      <obj_property name="ElementShortName">current_check_rd[2:0]</obj_property>
+      <obj_property name="ObjectShortName">current_check_rd[2:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/u">
+      <obj_property name="ElementShortName">u[2:0]</obj_property>
+      <obj_property name="ObjectShortName">u[2:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="array" fp_name="/tb/u[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/u[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/u[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/u[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/u[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/u[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/mask_avaliable">
+      <obj_property name="ElementShortName">mask_avaliable[2:0][5:0]</obj_property>
+      <obj_property name="ObjectShortName">mask_avaliable[2:0][5:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/expect_data">
+      <obj_property name="ElementShortName">expect_data[2:0][5:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">expect_data[2:0][5:0][15:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/flag_eq">
+      <obj_property name="ElementShortName">flag_eq[2:0]</obj_property>
+      <obj_property name="ObjectShortName">flag_eq[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/n">
+      <obj_property name="ElementShortName">n[31:0]</obj_property>
+      <obj_property name="ObjectShortName">n[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/nb">
+      <obj_property name="ElementShortName">nb[31:0]</obj_property>
+      <obj_property name="ObjectShortName">nb[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/maxkeep">
+      <obj_property name="ElementShortName">maxkeep[31:0]</obj_property>
+      <obj_property name="ObjectShortName">maxkeep[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/uut/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/uut/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/r_addr">
+      <obj_property name="ElementShortName">r_addr[2:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">r_addr[2:0][15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/r_avalid">
+      <obj_property name="ElementShortName">r_avalid[2:0]</obj_property>
+      <obj_property name="ObjectShortName">r_avalid[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/r_dvalid">
+      <obj_property name="ElementShortName">r_dvalid[2:0]</obj_property>
+      <obj_property name="ObjectShortName">r_dvalid[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/r_data">
+      <obj_property name="ElementShortName">r_data[2:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">r_data[2:0][15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/r_aready">
+      <obj_property name="ElementShortName">r_aready[2:0]</obj_property>
+      <obj_property name="ObjectShortName">r_aready[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/w_addr">
+      <obj_property name="ElementShortName">w_addr[2:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">w_addr[2:0][15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/w_data">
+      <obj_property name="ElementShortName">w_data[2:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">w_data[2:0][15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/w_valid">
+      <obj_property name="ElementShortName">w_valid[2:0]</obj_property>
+      <obj_property name="ObjectShortName">w_valid[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/w_ready">
+      <obj_property name="ElementShortName">w_ready[2:0]</obj_property>
+      <obj_property name="ObjectShortName">w_ready[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/mem_r_addr">
+      <obj_property name="ElementShortName">mem_r_addr[15:0]</obj_property>
+      <obj_property name="ObjectShortName">mem_r_addr[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/uut/mem_r_avalid">
+      <obj_property name="ElementShortName">mem_r_avalid</obj_property>
+      <obj_property name="ObjectShortName">mem_r_avalid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/uut/mem_r_dvalid">
+      <obj_property name="ElementShortName">mem_r_dvalid</obj_property>
+      <obj_property name="ObjectShortName">mem_r_dvalid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/mem_r_data">
+      <obj_property name="ElementShortName">mem_r_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">mem_r_data[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/mem_w_addr">
+      <obj_property name="ElementShortName">mem_w_addr[15:0]</obj_property>
+      <obj_property name="ObjectShortName">mem_w_addr[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/mem_w_data">
+      <obj_property name="ElementShortName">mem_w_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">mem_w_data[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb/uut/mem_w_valid">
+      <obj_property name="ElementShortName">mem_w_valid</obj_property>
+      <obj_property name="ObjectShortName">mem_w_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/r_grant">
+      <obj_property name="ElementShortName">r_grant[2:0]</obj_property>
+      <obj_property name="ObjectShortName">r_grant[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/w_grant">
+      <obj_property name="ElementShortName">w_grant[2:0]</obj_property>
+      <obj_property name="ObjectShortName">w_grant[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/r_dvalid_shift">
+      <obj_property name="ElementShortName">r_dvalid_shift[0:1][2:0]</obj_property>
+      <obj_property name="ObjectShortName">r_dvalid_shift[0:1][2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/sync_r_aready">
+      <obj_property name="ElementShortName">sync_r_aready[2:0]</obj_property>
+      <obj_property name="ObjectShortName">sync_r_aready[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/sync_w_ready">
+      <obj_property name="ElementShortName">sync_w_ready[2:0]</obj_property>
+      <obj_property name="ObjectShortName">sync_w_ready[2:0]</obj_property>
+   </wvobject>
+</wave_config>

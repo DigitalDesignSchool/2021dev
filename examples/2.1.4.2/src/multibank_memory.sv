@@ -108,12 +108,59 @@ module multibank_memory
   );
 
 
-  // assigning output ports
-  assign r_dvalid = r_dvalid_bank.or();
-  assign r_data   = r_data_bank.or();
-  assign r_aready = r_ready_bank.or();
-  assign w_ready  = w_ready_bank.or();
+//  assigning output ports
+//  assign r_dvalid = r_dvalid_bank.or();
+//  assign r_data   = r_data_bank.or();
+//  assign r_aready = r_ready_bank.or();
+//  assign w_ready  = w_ready_bank.or();
 
+logic [READ_PORTS-1:0]     			 r_dvalid_i;
+logic [READ_PORTS-1:0][DATA_WIDTH-1:0] r_data_i;
+logic [READ_PORTS-1:0]				 r_aready_i;
+logic [WRITE_PORTS-1:0]			      w_ready_i;
+
+assign r_dvalid = r_dvalid_i;
+assign r_data   = r_data_i;
+assign r_aready = r_aready_i;
+assign w_ready  = w_ready_i;
+
+genvar jj;
+generate
+    for(jj = 0; jj < READ_PORTS; jj++ ) begin
+                
+        // assign r_dvalid[j] = | r_dvalid_bank[j];
+        // assign r_aready[j] = | r_ready_bank[j];
+        // assign w_ready[j]  = | w_ready_bank[j];
+
+        always_comb begin
+            r_dvalid_i[jj] = r_dvalid_bank[0][jj];
+            for( int ii=1; ii<BANKS; ii++ )
+                r_dvalid_i[jj] = r_dvalid_i[jj] | r_dvalid_bank[ii][jj];
+        end
+        
+            
+        always_comb begin
+            r_data_i[jj] = r_data_bank[0][jj];
+            for( int ii=1; ii<BANKS; ii++ )
+                r_data_i[jj] = r_data_i[jj] | r_data_bank[ii][jj];
+        end
+
+        always_comb begin
+            r_aready_i[jj] = r_ready_bank[0][jj];
+            for( int ii=1; ii<BANKS; ii++ )
+                r_aready_i[jj] = r_aready_i[jj] | r_ready_bank[ii][jj];
+        end
+
+        always_comb begin
+            w_ready_i[jj] = w_ready_bank[0][jj];
+            for( int ii=1; ii<BANKS; ii++ )
+                w_ready_i[jj] = w_ready_i[jj] | w_ready_bank[ii][jj];
+        end
+
+    end
+
+
+endgenerate
 endmodule
 
 `default_nettype wire

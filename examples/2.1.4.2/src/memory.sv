@@ -1,41 +1,65 @@
 `default_nettype none
-/*
- * Round-robin arbiter {from Intel Cookbook} 
- * The round-robin pointer is updated by moving the pointer 
- * to the requester after the one which just received the grant (III type).
+/* 
+ * Pseudo dual port memory (1 read port and 1 write port)
+ * with read latency
  */
-module arbiter
+module pseudo_dual_port_memory
   #(
-    parameter N = 5 // Number of requesters
+    parameter  DATA_WIDTH = 32,
+    parameter  ADDR_WIDTH = 4,
+    parameter  DATA_LAT   = 2,		   		    // Delay in cycles between data request and data output 
+    localparam ADDR_MAX   = {ADDR_WIDTH{1'b1}} 	// 2 ^ ADDR_WIDTH -1
   )(
-    input wire		    rst,
-    input wire			clk,
-    input wire  [N-1:0] req,
-    output wire [N-1:0]	grant
+    input wire clk,
+    input wire rst,
+
+    // Read port 
+    input wire [ADDR_WIDTH-1:0]  r_addr,
+    input wire      		 	 r_avalid,
+
+    output wire				     r_dvalid,
+    output wire [DATA_WIDTH-1:0] r_data,
+    
+    // Write port 
+    input wire [ADDR_WIDTH-1:0]  w_addr,
+    input wire [DATA_WIDTH-1:0]  w_data,
+    input wire				     w_valid
   );
 
-  reg  [N-1:0] pointer_req;
-  reg  [N-1:0] next_grant;
+  // Memory as multi-dimensional array
+  reg [DATA_WIDTH-1:0] memory [ADDR_MAX-1:0];
 
-  wire [2*N-1:0] double_req = {req,req};
-  wire [2*N-1:0] double_grant = double_req & ~(double_req - pointer_req);
+  // Write data to memory
+  always @(posedge clk)
+    if( w_valid )    
+      memory[w_addr] <= #1 w_data;
+
+  // Read data from memory with latency
+  reg 			       r_dvalid_shift [DATA_LAT-1:0];
+  reg [DATA_WIDTH-1:0] r_data_shift   [DATA_LAT-1:0];
+
+  always @(posedge clk) begin
+    if (rst)
+      r_dvalid_shift <= #1 '{DATA_LAT{0}};
+    else begin
+      r_dvalid_shift[0] <= #1 r_avalid;
+
+      // Forwarding
+      if( w_valid && w_addr == r_addr )
+        r_data_shift[0]  <= #1 w_data;
+      else 
+        r_data_shift[0]  <= #1 memory[r_addr];
+
+      // Shifting
+      for (int i = 1; i < DATA_LAT; i++) begin
+        r_dvalid_shift[i] <= #1 r_dvalid_shift[i - 1];
+        r_data_shift[i]   <= #1 r_data_shift[i - 1];
+      end
+    end
+  end
   
-  //Asynchronous grant update
-//   assign grant = (rst)? {N{1'b0}} : double_grant[N-1:0] | double_grant[2*N-1:N];
-  assign grant = double_grant[N-1:0] | double_grant[2*N-1:N];
-
-  //Update the rotate pointer 
-  wire [N-1:0]   new_req = req ^ grant;
-  wire [2*N-1:0] new_double_req = {new_req,new_req};
-  wire [2*N-1:0] new_double_grant  = new_double_req & ~(new_double_req - pointer_req);
-  wire [N-1:0]	 async_pointer_req =  new_double_grant[N-1:0] | new_double_grant[2*N-1:N];
-  
-  always @ (posedge clk)
-    if (rst || async_pointer_req == 0)
-      pointer_req <= #1 1;
-    else	 
-      pointer_req <= #1 async_pointer_req;
-
+  assign r_dvalid = r_dvalid_shift [DATA_LAT-1];
+  assign r_data   = r_data_shift   [DATA_LAT-1];
 endmodule
 
 `default_nettype wire

@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="10fs"></ZoomEndTime>
-      <Cursor1Time time="0fs"></Cursor1Time>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="3,505.001 ns"></ZoomEndTime>
+      <Cursor1Time time="3,505.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="283"></NameColumnWidth>
-      <ValueColumnWidth column_width="86"></ValueColumnWidth>
+      <ValueColumnWidth column_width="82"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="28" />
+   <WVObjectSize size="29" />
    <wvobject type="logic" fp_name="/tb/uut/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -36,10 +36,6 @@
    <wvobject type="array" fp_name="/tb/uut/r_avalid">
       <obj_property name="ElementShortName">r_avalid[2:0]</obj_property>
       <obj_property name="ObjectShortName">r_avalid[2:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/r_dvalid">
-      <obj_property name="ElementShortName">r_dvalid[2:0]</obj_property>
-      <obj_property name="ObjectShortName">r_dvalid[2:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/tb/uut/r_data">
       <obj_property name="ElementShortName">r_data[2:0][15:0]</obj_property>
@@ -65,57 +61,94 @@
       <obj_property name="ElementShortName">w_ready[2:0]</obj_property>
       <obj_property name="ObjectShortName">w_ready[2:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/mem_r_addr">
-      <obj_property name="ElementShortName">mem_r_addr[15:0]</obj_property>
-      <obj_property name="ObjectShortName">mem_r_addr[15:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/r_decoder_valid">
+      <obj_property name="ElementShortName">r_decoder_valid[2:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">r_decoder_valid[2:0][3:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="array" fp_name="/tb/uut/r_decoder_valid[2]">
+         <obj_property name="ElementShortName">[2][3:0]</obj_property>
+         <obj_property name="ObjectShortName">[2][3:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/uut/r_decoder_valid[1]">
+         <obj_property name="ElementShortName">[1][3:0]</obj_property>
+         <obj_property name="ObjectShortName">[1][3:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/uut/r_decoder_valid[0]">
+         <obj_property name="ElementShortName">[0][3:0]</obj_property>
+         <obj_property name="ObjectShortName">[0][3:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb/uut/mem_r_avalid">
-      <obj_property name="ElementShortName">mem_r_avalid</obj_property>
-      <obj_property name="ObjectShortName">mem_r_avalid</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/w_decoder_valid">
+      <obj_property name="ElementShortName">w_decoder_valid[2:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">w_decoder_valid[2:0][3:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb/uut/mem_r_dvalid">
-      <obj_property name="ElementShortName">mem_r_dvalid</obj_property>
-      <obj_property name="ObjectShortName">mem_r_dvalid</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/r_bank_addrress">
+      <obj_property name="ElementShortName">r_bank_addrress[2:0][13:0]</obj_property>
+      <obj_property name="ObjectShortName">r_bank_addrress[2:0][13:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/mem_r_data">
-      <obj_property name="ElementShortName">mem_r_data[15:0]</obj_property>
-      <obj_property name="ObjectShortName">mem_r_data[15:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/w_bank_addrress">
+      <obj_property name="ElementShortName">w_bank_addrress[2:0][13:0]</obj_property>
+      <obj_property name="ObjectShortName">w_bank_addrress[2:0][13:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/mem_w_addr">
-      <obj_property name="ElementShortName">mem_w_addr[15:0]</obj_property>
-      <obj_property name="ObjectShortName">mem_w_addr[15:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/r_req_to_bank">
+      <obj_property name="ElementShortName">r_req_to_bank[3:0][2:0]</obj_property>
+      <obj_property name="ObjectShortName">r_req_to_bank[3:0][2:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/mem_w_data">
-      <obj_property name="ElementShortName">mem_w_data[15:0]</obj_property>
-      <obj_property name="ObjectShortName">mem_w_data[15:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/w_req_to_bank">
+      <obj_property name="ElementShortName">w_req_to_bank[3:0][2:0]</obj_property>
+      <obj_property name="ObjectShortName">w_req_to_bank[3:0][2:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb/uut/mem_w_valid">
-      <obj_property name="ElementShortName">mem_w_valid</obj_property>
-      <obj_property name="ObjectShortName">mem_w_valid</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/r_dvalid_bank">
+      <obj_property name="ElementShortName">r_dvalid_bank[3:0][2:0]</obj_property>
+      <obj_property name="ObjectShortName">r_dvalid_bank[3:0][2:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="array" fp_name="/tb/uut/r_dvalid_bank[3]">
+         <obj_property name="ElementShortName">[3][2:0]</obj_property>
+         <obj_property name="ObjectShortName">[3][2:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/uut/r_dvalid_bank[2]">
+         <obj_property name="ElementShortName">[2][2:0]</obj_property>
+         <obj_property name="ObjectShortName">[2][2:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/uut/r_dvalid_bank[1]">
+         <obj_property name="ElementShortName">[1][2:0]</obj_property>
+         <obj_property name="ObjectShortName">[1][2:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb/uut/r_dvalid_bank[0]">
+         <obj_property name="ElementShortName">[0][2:0]</obj_property>
+         <obj_property name="ObjectShortName">[0][2:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/r_grant">
-      <obj_property name="ElementShortName">r_grant[2:0]</obj_property>
-      <obj_property name="ObjectShortName">r_grant[2:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/r_dvalid">
+      <obj_property name="ElementShortName">r_dvalid[2:0]</obj_property>
+      <obj_property name="ObjectShortName">r_dvalid[2:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/w_grant">
-      <obj_property name="ElementShortName">w_grant[2:0]</obj_property>
-      <obj_property name="ObjectShortName">w_grant[2:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/r_data_bank">
+      <obj_property name="ElementShortName">r_data_bank[3:0][2:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">r_data_bank[3:0][2:0][15:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/r_dvalid_shift">
-      <obj_property name="ElementShortName">r_dvalid_shift[0:1][2:0]</obj_property>
-      <obj_property name="ObjectShortName">r_dvalid_shift[0:1][2:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/r_ready_bank">
+      <obj_property name="ElementShortName">r_ready_bank[3:0][2:0]</obj_property>
+      <obj_property name="ObjectShortName">r_ready_bank[3:0][2:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/sync_r_aready">
-      <obj_property name="ElementShortName">sync_r_aready[2:0]</obj_property>
-      <obj_property name="ObjectShortName">sync_r_aready[2:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/w_ready_bank">
+      <obj_property name="ElementShortName">w_ready_bank[3:0][2:0]</obj_property>
+      <obj_property name="ObjectShortName">w_ready_bank[3:0][2:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/sync_w_ready">
-      <obj_property name="ElementShortName">sync_w_ready[2:0]</obj_property>
-      <obj_property name="ObjectShortName">sync_w_ready[2:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/READ_PORTS">
+      <obj_property name="ElementShortName">READ_PORTS[31:0]</obj_property>
+      <obj_property name="ObjectShortName">READ_PORTS[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/REQUESTERS">
-      <obj_property name="ElementShortName">REQUESTERS[31:0]</obj_property>
-      <obj_property name="ObjectShortName">REQUESTERS[31:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/WRITE_PORTS">
+      <obj_property name="ElementShortName">WRITE_PORTS[31:0]</obj_property>
+      <obj_property name="ObjectShortName">WRITE_PORTS[31:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/tb/uut/DATA_WIDTH">
       <obj_property name="ElementShortName">DATA_WIDTH[31:0]</obj_property>
@@ -125,12 +158,20 @@
       <obj_property name="ElementShortName">ADDR_WIDTH[31:0]</obj_property>
       <obj_property name="ObjectShortName">ADDR_WIDTH[31:0]</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/BANKS">
+      <obj_property name="ElementShortName">BANKS[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BANKS[31:0]</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/tb/uut/ADDR_MAX">
       <obj_property name="ElementShortName">ADDR_MAX[15:0]</obj_property>
       <obj_property name="ObjectShortName">ADDR_MAX[15:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb/uut/DATA_LAT">
-      <obj_property name="ElementShortName">DATA_LAT[31:0]</obj_property>
-      <obj_property name="ObjectShortName">DATA_LAT[31:0]</obj_property>
+   <wvobject type="array" fp_name="/tb/uut/BANK_SIZE">
+      <obj_property name="ElementShortName">BANK_SIZE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BANK_SIZE[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/uut/BANK_WIDTH">
+      <obj_property name="ElementShortName">BANK_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BANK_WIDTH[31:0]</obj_property>
    </wvobject>
 </wave_config>

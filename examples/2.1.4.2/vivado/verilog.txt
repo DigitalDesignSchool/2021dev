@@ -1,2 +1,2 @@
-../src_m2/design.sv
-../src_m2/testbench.sv
+../src/design.sv
+../src/testbench.sv

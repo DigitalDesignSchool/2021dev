@@ -25,7 +25,7 @@ typedef struct
 
 } type_transaction;
 
-localparam  MAX_TRANSACTION   = 100000;
+localparam  MAX_TRANSACTION   = 10000;
 
 typedef struct
 {
@@ -61,20 +61,20 @@ typedef struct
 
 typedef struct
 {
-    int                     r_delay[100000];
+    int                     r_delay[MAX_TRANSACTION];
     int                     r_cnt;
     int                     r_start;
     int                     r_delay_min;
     int                     r_delay_max;
-    int                     r_delay_avr;
+    real                    r_delay_avr;
     real                    r_velocity;
 
-    int                     w_delay[100000];
+    int                     w_delay[MAX_TRANSACTION];
     int                     w_cnt;
     int                     w_start;
     int                     w_delay_min;
     int                     w_delay_max;
-    int                     w_delay_avr;
+    real                    w_delay_avr;
     real                    w_velocity;
 
 } type_stat;

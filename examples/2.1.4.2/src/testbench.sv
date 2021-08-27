@@ -37,6 +37,9 @@ begin
     $display( "test_id=%-5d test_name: %15s         TEST_FAILED *******", test_id, test_name );
   end
   
+  $display("");
+  $display("");
+
   $stop();
 end endtask  
   
@@ -402,7 +405,7 @@ begin
 
   //type_transaction tr_rd  = new( addr, delay );
   automatic type_transaction tr_rd;
-    tr_rd.addr      = addr;
+    tr_rd.addr      = addr & 16'hFFFF;
     tr_rd.delay     = delay;
     tr_rd.op        = 1;
     tr_rd.sync_tick = 0;
@@ -450,7 +453,7 @@ begin
 
  
   automatic type_transaction tr_wr;
-    tr_wr.addr      = addr;
+    tr_wr.addr      = addr & 16'hFFFF;
     tr_wr.data      = data;
     tr_wr.delay     = delay;
     tr_wr.op        = 4;
@@ -749,7 +752,7 @@ class randomize_full_t;
 
     delay dist
     {
-      [             1 :     5  ] := 90,
+      [             0 :     5  ] := 90,
       [             5 :     8  ] := 8,
       [             8 :     16 ] := 2
     }; 
@@ -767,10 +770,32 @@ begin
 
       r.addr[7:0] = '0;
 
-      if( 0==r.op )
+      if( 0==r.op ) begin
         read_data( r.port_mask, r.addr, r.delay );
-      else
+        if( 0==r.delay ) begin
+            automatic int n = $urandom_range( 0, 32 );
+            for( int jj=0; jj<n; jj++ ) begin
+                r.addr++;
+                read_data( r.port_mask, r.addr, 0 );
+            end
+            r.addr++;
+            read_data( r.port_mask, r.addr, 1 );
+        end
+      end else begin
         write_data( r.port_mask, r.addr, r.data, r.delay );
+        if( 0==r.delay ) begin
+            automatic int n = $urandom_range( 0, 32 );
+            for( int jj=0; jj<n; jj++ ) begin
+                r.addr++;
+                r.data++;
+                write_data( r.port_mask, r.addr, r.data, 0 );
+            end
+            r.addr++;
+            r.data++;
+            write_data( r.port_mask, r.addr, r.data, 1 );
+        end
+
+      end
 
       if( ii<16 )
         $display("%s", r.str() );
@@ -795,10 +820,32 @@ begin
 
       r.addr[7:0] = '0;
 
-      if( 0==r.op )
+      if( 0==r.op ) begin
         read_data( r.port_mask, r.addr, r.delay );
-      else
+        if( 0==r.delay ) begin
+            automatic int n = $urandom_range( 0, 32 );
+            for( int jj=0; jj<n; jj++ ) begin
+                r.addr++;
+                read_data( r.port_mask, r.addr, 0 );
+            end
+            r.addr++;
+            read_data( r.port_mask, r.addr, 1 );
+        end
+      end else begin
         write_data( r.port_mask, r.addr, r.data, r.delay );
+        if( 0==r.delay ) begin
+            automatic int n = $urandom_range( 0, 32 );
+            for( int jj=0; jj<n; jj++ ) begin
+                r.addr++;
+                r.data++;
+                write_data( r.port_mask, r.addr, r.data, 0 );
+            end
+            r.addr++;
+            r.data++;
+            write_data( r.port_mask, r.addr, r.data, 1 );
+        end
+
+      end
 
       if( ii<16 )
         $display("%s", r.str() );
@@ -820,10 +867,32 @@ begin
 
       r.addr[7:0] = '0;
 
-      if( 0==r.op )
+      if( 0==r.op ) begin
         read_data( r.port_mask, r.addr, r.delay );
-      else
+        if( 0==r.delay ) begin
+            automatic int n = $urandom_range( 0, 32 );
+            for( int jj=0; jj<n; jj++ ) begin
+                r.addr++;
+                read_data( r.port_mask, r.addr, 0 );
+            end
+            r.addr++;
+            read_data( r.port_mask, r.addr, 1 );
+        end
+      end else begin
         write_data( r.port_mask, r.addr, r.data, r.delay );
+        if( 0==r.delay ) begin
+            automatic int n = $urandom_range( 0, 32 );
+            for( int jj=0; jj<n; jj++ ) begin
+                r.addr++;
+                r.data++;
+                write_data( r.port_mask, r.addr, r.data, 0 );
+            end
+            r.addr++;
+            r.data++;
+            write_data( r.port_mask, r.addr, r.data, 1 );
+        end
+
+      end
 
       if( ii<16 )
         $display("%s", r.str() );
@@ -896,7 +965,7 @@ end
 always @(posedge clk)  tick_current <= #1 tick_current+1;
 
 initial begin
-    #200000;
+    #400000;
     $display( "Timeout");
     test_timeout = '1;
 end
@@ -958,10 +1027,14 @@ initial begin
     automatic int curr_delay = st[ii].r_delay[0]; 
     automatic int min_delay=curr_delay;
     automatic int max_delay=curr_delay;
-    automatic int avr_delay=curr_delay;
-    
+    automatic real avr_delay=curr_delay;
+    automatic int cnt = st[ii].r_cnt;
+    if( cnt>MAX_TRANSACTION )
+        cnt = MAX_TRANSACTION;
 
-    for( int jj=1; jj<st[ii].r_cnt; jj++ ) begin
+    $display( "read -port: %2d  cnt: %-4d", ii, cnt );
+
+    for( int jj=1; jj<cnt; jj++ ) begin
         curr_delay = st[ii].r_delay[jj]; 
 
         if( curr_delay<min_delay )
@@ -989,10 +1062,15 @@ initial begin
     automatic int curr_delay = st[ii].w_delay[0]; 
     automatic int min_delay=curr_delay;
     automatic int max_delay=curr_delay;
-    automatic int avr_delay=curr_delay;
+    automatic real avr_delay=curr_delay;
     
+    automatic int cnt = st[ii].w_cnt;
+    if( cnt>MAX_TRANSACTION )
+        cnt = MAX_TRANSACTION;
 
-    for( int jj=1; jj<st[ii].w_cnt; jj++ ) begin
+    $display( "write -port: %2d  cnt: %-4d", ii, cnt );
+
+    for( int jj=1; jj<cnt; jj++ ) begin
         curr_delay = st[ii].w_delay[jj]; 
 
         if( curr_delay<min_delay )
@@ -1006,8 +1084,8 @@ initial begin
 
     avr_delay /= st[ii].w_cnt;
 
-     st[ii].w_delay_min = min_delay;
-     st[ii].w_delay_max = max_delay;
+    st[ii].w_delay_min = min_delay;
+    st[ii].w_delay_max = max_delay;
     st[ii].w_delay_avr = avr_delay;
 
     st[ii].w_velocity = 1.0 * st[ii].w_cnt / tick_current;
@@ -1018,7 +1096,7 @@ initial begin
 
   for( int ii=0; ii<REQUESTERS; ii++ ) begin
 
-      $display( "Read operation for port %-2d   - count: %-5d   min_delay: %-4d  max_delay: %-4d  avr_delay: %-4d velocity: %f Tr/clock",
+      $display( "Read operation for port %-2d   - count: %-5d   min_delay: %-4d  max_delay: %-4d  avr_delay: %f velocity: %f Tr/clock",
                ii, st[ii].r_cnt, st[ii].r_delay_min, st[ii].r_delay_max, st[ii].r_delay_avr, st[ii].r_velocity 
       );
       
@@ -1028,7 +1106,7 @@ initial begin
 
   for( int ii=0; ii<REQUESTERS; ii++ ) begin
 
-      $display( "Write operation for port %-2d  - count: %-5d   min_delay: %-4d  max_delay: %-4d  avr_delay: %-4d velocity: %f Tr/clock",
+      $display( "Write operation for port %-2d  - count: %-5d   min_delay: %-4d  max_delay: %-4d  avr_delay: %f velocity: %f Tr/clock",
                ii, st[ii].w_cnt, st[ii].w_delay_min, st[ii].w_delay_max, st[ii].w_delay_avr, st[ii].w_velocity 
       );
       
@@ -1040,7 +1118,6 @@ initial begin
     test_finish( test_id, test_name[test_id], 1 );  // test passed
   else
     test_finish( test_id, test_name[test_id], 0 );  // test failed
-
 
 
 end

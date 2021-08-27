@@ -25,6 +25,8 @@ typedef struct
 
 } type_transaction;
 
+localparam  MAX_TRANSACTION   = 100000;
+
 typedef struct
 {
     logic [ADDR_WIDTH-1:0]  r_addr;
@@ -37,7 +39,45 @@ typedef struct
     logic [DATA_WIDTH-1:0]  w_data;
     logic   			    w_valid;
     logic   		        w_ready;
+
+    // int                     r_delay[100000];
+    // int                     r_cnt;
+    // int                     r_start;
+//     int                     r_delay_min;
+//     int                     r_delay_max;
+//     int                     r_delay_avr;
+//     real                    r_velocity;
+
+    // int                     w_delay[100000];
+    // int                     w_cnt;
+    // int                     w_start;
+//     int                     w_delay_min;
+//     int                     w_delay_max;
+//     int                     w_delay_avr;
+//     real                    w_velocity;
+
 } type_uut;
+
+
+typedef struct
+{
+    int                     r_delay[100000];
+    int                     r_cnt;
+    int                     r_start;
+    int                     r_delay_min;
+    int                     r_delay_max;
+    int                     r_delay_avr;
+    real                    r_velocity;
+
+    int                     w_delay[100000];
+    int                     w_cnt;
+    int                     w_start;
+    int                     w_delay_min;
+    int                     w_delay_max;
+    int                     w_delay_avr;
+    real                    w_velocity;
+
+} type_stat;
 
 // class type_transaction_wr;
 

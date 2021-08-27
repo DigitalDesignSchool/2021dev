@@ -9,6 +9,7 @@
 import transaction_pkg::*;
 import golden_memory_pkg::*;
 
+
 module tb
   ();
   
@@ -58,24 +59,11 @@ logic               test_timeout=0;
 logic               test_done=0;
 int                 out_ready_cnt=0;
 
-int                 randomize_loop=1000;
+int                 randomize_loop=10000;
 
 golden_memory_t     golden_memory;
 int                 tick_current=0;
 
-// Queue
-// type_transaction q0_transaction_drive_rd  [$];
-// type_transaction q1_transaction_drive_rd  [$];
-// type_transaction q2_transaction_drive_rd  [$];
-
-// type_transaction current_drive_rd_0;
-// type_transaction current_drive_rd_1;
-// type_transaction current_drive_rd_2;
-
-
-// type_transaction q0_transaction_check_rd  [$];
-// type_transaction q1_transaction_check_rd  [$];
-// type_transaction q2_transaction_check_rd  [$];
 
 type_transaction qa_transaction_drive_rd[REQUESTERS-1:0]  [$];
 type_transaction qa_transaction_check_rd[REQUESTERS-1:0]  [$];
@@ -85,7 +73,10 @@ type_transaction current_check_rd[REQUESTERS-1:0];
 type_transaction qa_transaction_drive_wr[REQUESTERS-1:0]  [$];
 type_transaction current_drive_wr[REQUESTERS-1:0];
 
-type_uut  u[REQUESTERS-1:0];
+int qa_rd_start[REQUESTERS-1:0]  [$];
+
+type_uut   u[REQUESTERS-1:0];
+type_stat  st[REQUESTERS-1:0];
   
 wire [15:0] r2_r_addr = u[2].r_addr;
 wire [15:0] r1_r_addr = u[1].r_addr;
@@ -147,6 +138,31 @@ multibank_memory
 );
 
 
+// multibank_memory
+//   #(
+//     .READ_PORTS		(	REQUESTERS	), 
+//     .WRITE_PORTS	(	REQUESTERS	),
+//     .DATA_WIDTH     (   DATA_WIDTH  ),
+//     .ADDR_WIDTH     (   ADDR_WIDTH  ),
+//     .BANKS 			(   BANKS     	)
+// ) uut
+// (
+//     .r_addr         (   {u[5].r_addr,   u[4].r_addr,    u[3].r_addr   , u[2].r_addr,   u[1].r_addr,    u[0].r_addr   } ),
+//     .r_avalid       (   {u[5].r_avalid, u[4].r_avalid,  u[3].r_avalid , u[2].r_avalid, u[1].r_avalid,  u[0].r_avalid } ),
+//     .r_dvalid       (   {u[5].r_dvalid, u[4].r_dvalid,  u[3].r_dvalid , u[2].r_dvalid, u[1].r_dvalid,  u[0].r_dvalid } ),
+//     .r_data         (   {u[5].r_data,   u[4].r_data,    u[3].r_data   , u[2].r_data,   u[1].r_data,    u[0].r_data   } ),
+//     .r_aready       (   {u[5].r_aready, u[4].r_aready,  u[3].r_aready , u[2].r_aready, u[1].r_aready,  u[0].r_aready } ),
+
+//     .w_addr         (   {u[5].w_addr,   u[4].w_addr,    u[3].w_addr   , u[2].w_addr,   u[1].w_addr,    u[0].w_addr   } ),
+//     .w_data         (   {u[5].w_data,   u[4].w_data,    u[3].w_data   , u[2].w_data,   u[1].w_data,    u[0].w_data   } ),
+//     .w_valid        (   {u[5].w_valid,  u[4].w_valid,   u[3].w_valid  , u[2].w_valid,  u[1].w_valid,   u[0].w_valid } ),
+//     .w_ready        (   {u[5].w_ready,  u[4].w_ready,   u[3].w_ready  , u[2].w_ready,  u[1].w_ready,   u[0].w_ready } ),
+
+//                     .*
+
+                    
+// );
+
 // Fill memory 
 
 localparam ADDR_MAX  = 2 ** ADDR_WIDTH - 1;
@@ -161,8 +177,8 @@ initial begin
     uut.bank[2].memory.memory[ii] = ii + BANK_SIZE * 2;
   for( int ii=0; ii < BANK_SIZE; ii++ )
     uut.bank[3].memory.memory[ii] = ii + BANK_SIZE * 3;
-  
-  
+
+
 end 
 
 initial begin
@@ -215,8 +231,8 @@ generate
           u[ii].r_addr   <= #1 current_drive_rd[ii].addr;
           u[ii].r_avalid <= #1 '1;
 
-          // r_addr[0]  <= #1 current_drive_rd_0.addr;
-          // r_avalid[0]  <= #1 '1;
+
+          qa_rd_start[ii].push_back(tick_current);
 
           @(posedge clk iff u[ii].r_aready & u[ii].r_avalid);
 
@@ -270,10 +286,14 @@ generate
           u[ii].w_data   <= #1 current_drive_wr[ii].data;
           u[ii].w_valid <= #1 '1;
 
-          // r_addr[0]  <= #1 current_drive_rd_0.addr;
-          // r_avalid[0]  <= #1 '1;
+          st[ii].w_start =  tick_current; 
 
           @(posedge clk iff u[ii].w_ready & u[ii].w_valid);
+          
+          if( st[ii].w_cnt < MAX_TRANSACTION ) begin
+            st[ii].w_delay[st[ii].w_cnt] =  tick_current - st[ii].w_start; 
+            st[ii].w_cnt++;
+          end
 
           if( current_drive_wr[ii].delay>0 ) begin
             //r_avalid[0]  <= #1 '0;
@@ -307,6 +327,12 @@ generate
           end
           cnt_error++;
       end else begin
+
+          st[ii].r_start = qa_rd_start[ii].pop_front();
+          if( st[ii].r_cnt<MAX_TRANSACTION ) begin
+            st[ii].r_delay[st[ii].r_cnt] = tick_current - st[ii].r_start;
+            st[ii].r_cnt++;
+          end
 
           current_check_rd[ii] = qa_transaction_check_rd[ii].pop_front();
           //$display("current_check_rd[%-d] addr: %h ", ii, current_check_rd[ii].addr );
@@ -392,7 +418,23 @@ begin
         qa_transaction_drive_rd[2].push_back(tr_rd);
         qa_transaction_check_rd[2].push_back(tr_rd);
   end
-  
+
+//   if( qn & 8 )  begin 
+//         qa_transaction_drive_rd[3].push_back(tr_rd);
+//         qa_transaction_check_rd[3].push_back(tr_rd);
+//   end
+
+//   if( qn & 'h10 )  begin 
+//         qa_transaction_drive_rd[4].push_back(tr_rd);
+//         qa_transaction_check_rd[4].push_back(tr_rd);
+//   end
+
+//   if( qn & 'h20 )  begin 
+//         qa_transaction_drive_rd[5].push_back(tr_rd);
+//         qa_transaction_check_rd[5].push_back(tr_rd);
+//   end
+
+
 
 end endtask;
 
@@ -422,6 +464,18 @@ begin
   if( qn & 4 )  begin 
         qa_transaction_drive_wr[2].push_back(tr_wr);
   end
+  
+//   if( qn & 8 )  begin 
+//         qa_transaction_drive_wr[3].push_back(tr_wr);
+//   end
+  
+//   if( qn & 'h10 )  begin 
+//         qa_transaction_drive_wr[4].push_back(tr_wr);
+//   end
+  
+//   if( qn & 'h20 )  begin 
+//         qa_transaction_drive_wr[5].push_back(tr_wr);
+//   end
   
 
 end endtask;
@@ -530,7 +584,7 @@ end endtask;
 
 task test_seq1;
 begin
-       read_data( 2, 16'h0110, 2 );
+       read_data( 2, 16'h4110, 2 );
        read_data( 2, 16'h0111, 2 );
        read_data( 2, 16'h0112, 2 );
        read_data( 2, 16'h0113, 2 );
@@ -599,7 +653,7 @@ end endtask;
 
 task test_seq2;
 begin
-      read_data( 4, 16'h0210, 2 );
+      read_data( 4, 16'h8210, 2 );
       read_data( 4, 16'h0211, 2 );
       read_data( 4, 16'h0212, 0 );
       read_data( 4, 16'h0213, 0 );
@@ -663,12 +717,12 @@ class randomize_full_t;
 
   constraint port_mask_c
   {
-    port_mask inside { 1, 2, 4 };
+    port_mask inside { 1, 2, 4, 8, 16, 32 };
   }
 
   constraint addr_c
   {
-    //adr[7:0] == 'h00;
+    //addr[7:0] == 'h00;
 
     addr dist
     {
@@ -676,6 +730,12 @@ class randomize_full_t;
       [      16'h4000 :     16'h7FFF ] := 25,
       [      16'h8000 :     16'hBFFF ] := 25,
       [      16'hC000 :     16'hFFFF ] := 25
+
+    //   [             0 :     16'h3FFF ] := 97,
+    //   [      16'h4000 :     16'h7FFF ] := 1,
+    //   [      16'h8000 :     16'hBFFF ] := 1,
+    //   [      16'hC000 :     16'hFFFF ] := 1
+
     }; 
   }
 
@@ -685,9 +745,9 @@ class randomize_full_t;
 
     delay dist
     {
-      [             1 :     2  ] := 50,
-      [             3 :     7  ] := 25,
-      [             7 :     16 ] := 25
+      [             1 :     5  ] := 90,
+      [             5 :     8  ] := 8,
+      [             8 :     16 ] := 2
     }; 
   }
 
@@ -700,6 +760,9 @@ begin
     automatic randomize_full_t r = new;
     for( int ii=0; ii<randomize_loop; ii++ ) begin
       assert( r.randomize() );
+
+      r.addr[7:0] = '0;
+
       if( 0==r.op )
         read_data( r.port_mask, r.addr, r.delay );
       else
@@ -763,7 +826,7 @@ end
 always @(posedge clk)  tick_current <= #1 tick_current+1;
 
 initial begin
-    #100000;
+    #200000;
     $display( "Timeout");
     test_timeout = '1;
 end
@@ -818,6 +881,90 @@ initial begin
 
   // $display("coverage of covergroup cg.o_rdy_transitions = %0f", uut.cg.o_rdy_transitions.get_coverage());
   
+
+
+  for( int ii=0; ii<REQUESTERS; ii++ ) begin
+
+    automatic int curr_delay = st[ii].r_delay[0]; 
+    automatic int min_delay=curr_delay;
+    automatic int max_delay=curr_delay;
+    automatic int avr_delay=curr_delay;
+    
+
+    for( int jj=1; jj<st[ii].r_cnt; jj++ ) begin
+        curr_delay = st[ii].r_delay[jj]; 
+
+        if( curr_delay<min_delay )
+            min_delay=curr_delay;
+
+        if( curr_delay>max_delay )
+            max_delay=curr_delay;
+
+        avr_delay +=curr_delay;
+    end
+
+    avr_delay /= st[ii].r_cnt;
+
+     st[ii].r_delay_min = min_delay;
+     st[ii].r_delay_max = max_delay;
+     st[ii].r_delay_avr = avr_delay;
+
+     st[ii].r_velocity = 1.0 * st[ii].r_cnt / tick_current;
+
+
+  end
+
+  for( int ii=0; ii<REQUESTERS; ii++ ) begin
+
+    automatic int curr_delay = st[ii].w_delay[0]; 
+    automatic int min_delay=curr_delay;
+    automatic int max_delay=curr_delay;
+    automatic int avr_delay=curr_delay;
+    
+
+    for( int jj=1; jj<st[ii].w_cnt; jj++ ) begin
+        curr_delay = st[ii].w_delay[jj]; 
+
+        if( curr_delay<min_delay )
+            min_delay=curr_delay;
+
+        if( curr_delay>max_delay )
+            max_delay=curr_delay;
+
+        avr_delay +=curr_delay;
+    end
+
+    avr_delay /= st[ii].w_cnt;
+
+     st[ii].w_delay_min = min_delay;
+     st[ii].w_delay_max = max_delay;
+    st[ii].w_delay_avr = avr_delay;
+
+    st[ii].w_velocity = 1.0 * st[ii].w_cnt / tick_current;
+
+  end  
+
+  $display("");
+
+  for( int ii=0; ii<REQUESTERS; ii++ ) begin
+
+      $display( "Read operation for port %-2d   - count: %-5d   min_delay: %-4d  max_delay: %-4d  avr_delay: %-4d velocity: %f Tr/clock",
+               ii, st[ii].r_cnt, st[ii].r_delay_min, st[ii].r_delay_max, st[ii].r_delay_avr, st[ii].r_velocity 
+      );
+      
+  end
+
+  $display("");
+
+  for( int ii=0; ii<REQUESTERS; ii++ ) begin
+
+      $display( "Write operation for port %-2d  - count: %-5d   min_delay: %-4d  max_delay: %-4d  avr_delay: %-4d velocity: %f Tr/clock",
+               ii, st[ii].w_cnt, st[ii].w_delay_min, st[ii].w_delay_max, st[ii].w_delay_avr, st[ii].w_velocity 
+      );
+      
+  end
+
+  $display("");
 
   if( 0==cnt_error && cnt_ok>0 )
     test_finish( test_id, test_name[test_id], 1 );  // test passed

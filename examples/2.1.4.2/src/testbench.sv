@@ -14,8 +14,10 @@ module tb
   ();
   
   
-  string	test_name[1:0]=
+  string	test_name[3:0]=
   {
+   "randomize_single",
+   "randomize_split_full",
    "randomize", 
    "direct" 
   };
@@ -112,6 +114,7 @@ logic                                     flag_eq[REQUESTERS-1:0];
 
   
 localparam  BANKS = 4;
+
 multibank_memory
   #(
     .READ_PORTS		(	REQUESTERS	), 
@@ -717,7 +720,8 @@ class randomize_full_t;
 
   constraint port_mask_c
   {
-    port_mask inside { 1, 2, 4, 8, 16, 32 };
+    //port_mask inside { 1, 2, 4, 8, 16, 32 };
+    port_mask inside { 1, 2, 4 };
   }
 
   constraint addr_c
@@ -773,7 +777,62 @@ begin
 
     end
     q_end( 7, 7 );
+    //q_end( 'h2F, 'h2F );
 end endtask; 
+
+task test_randomize_split_full;
+begin
+    
+    automatic randomize_full_t r = new;
+    for( int ii=0; ii<randomize_loop; ii++ ) begin
+      assert( r.randomize() );
+
+      case( r.port_mask )
+        1: r.addr[15:14] = 2'b00;
+        2: r.addr[15:14] = 2'b01;
+        4: r.addr[15:14] = 2'b10;
+      endcase
+
+      r.addr[7:0] = '0;
+
+      if( 0==r.op )
+        read_data( r.port_mask, r.addr, r.delay );
+      else
+        write_data( r.port_mask, r.addr, r.data, r.delay );
+
+      if( ii<16 )
+        $display("%s", r.str() );
+
+    end
+    q_end( 7, 7 );
+    //q_end( 'h2F, 'h2F );
+end endtask; 
+
+
+task test_randomize_single;
+begin
+    
+    automatic randomize_full_t r = new;
+    for( int ii=0; ii<randomize_loop; ii++ ) begin
+      assert( r.randomize() );
+
+      r.addr[15:14] = 2'b00;
+
+      r.addr[7:0] = '0;
+
+      if( 0==r.op )
+        read_data( r.port_mask, r.addr, r.delay );
+      else
+        write_data( r.port_mask, r.addr, r.data, r.delay );
+
+      if( ii<16 )
+        $display("%s", r.str() );
+
+    end
+    q_end( 7, 7 );
+    //q_end( 'h2F, 'h2F );
+end endtask; 
+
 
 // Generate test sequence 
 initial begin
@@ -800,6 +859,17 @@ initial begin
       $display("Test 1: %s", test_name[1]);
       test_randomize();
   end
+
+  2: begin
+      $display("Test 1: %s", test_name[1]);
+      test_randomize_split_full();
+  end
+
+  3: begin
+      $display("Test 1: %s", test_name[1]);
+      test_randomize_single();
+  end
+
   endcase
 
   // Wait for empty queues
@@ -836,7 +906,7 @@ initial begin
   int args=-1;
    
   if( $value$plusargs( "test_id=%0d", args )) begin
-    if( args>=0 && args<2 )
+    if( args>=0 && args<4 )
       test_id = args;
 
     $display( "args=%d  test_id=%d", args, test_id );

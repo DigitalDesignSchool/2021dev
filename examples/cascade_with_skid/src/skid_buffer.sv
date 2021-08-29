@@ -19,13 +19,15 @@ module skid_buffer
 );
 
 
-logic [1:0]         state; // 10 - empty, 11 - half, 01 - full
+(* keep = "true" *) logic [1:0]         state; // 10 - empty, 11 - half, 01 - full
 logic [nb-1:0]      buf_tdata;
 
 logic               is_write;
 logic               is_read;
 
-assign  is_write    = in_tvalid & in_tready;
+(* keep = "true" *) logic               in_ready_i;
+
+assign  is_write    = in_tvalid & in_ready_i;
 assign  is_read     = out_tvalid & out_tready;
 
 assign in_tready    = state[1];
@@ -43,6 +45,7 @@ always_ff @(posedge aclk) begin
             if( is_write ) begin
                 state <= #1 2'b11;
             end
+            in_ready_i <= #1 '1;
         end
 
         2'b11: begin // half: in_tready=1, out_tvalid=1
@@ -53,6 +56,7 @@ always_ff @(posedge aclk) begin
 
                 2'b10: begin   // write
                         state <= #1 2'b01;
+                        in_ready_i <= #1 '0;
                 end
 
                 2'b11: begin   // write & read
@@ -66,6 +70,7 @@ always_ff @(posedge aclk) begin
                if( is_read ) begin
                    state <= #1 2'b11;
                    out_tdata <= #1 buf_tdata;
+                   in_ready_i <= #1 '1;
                end 
         end
 

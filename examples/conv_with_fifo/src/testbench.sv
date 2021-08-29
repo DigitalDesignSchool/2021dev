@@ -96,7 +96,7 @@ ram256x16   ram
 );
 
   
-credit   uut
+conv_with_fifo   uut
 (
           .*
 );

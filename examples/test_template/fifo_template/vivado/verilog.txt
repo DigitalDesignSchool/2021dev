@@ -1,0 +1,2 @@
+../src/fifo_w8.sv
+../src/testbench.sv

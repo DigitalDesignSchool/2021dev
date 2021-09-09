@@ -105,83 +105,33 @@ end
 // Main process  
 initial begin  
 
-  automatic int args=-1;
-   
-  if( $value$plusargs( "test_id=%0d", args )) begin
-    if( args>=0 && args<2 )
-      test_id = args;
+    automatic int args=-1;
+    
+    if( $value$plusargs( "test_id=%0d", args )) begin
+        if( args>=0 && args<2 )
+        test_id = args;
 
-    $display( "args=%d  test_id=%d", args, test_id );
+        $display( "args=%d  test_id=%d", args, test_id );
 
-  end
-
-  $display("chip-expo-2021-template-3-axi_stream  test_id=%d  name:", test_id, test_name[test_id] );
-  
-  reset_n = '0;
-
-  #100;
-
-  reset_n = '1;
-
-
-
-  case( test_id )
-    0: begin
-        // some action for test_id==0
-
-            #500;
-            @(posedge clk);
-            write_data( "ABCDE", 0 );
-
-            write_data( "FGHIJ", 2 );
-
-
-            write_data( "KLMON", 0 );
-            set_outready_cnt(4);
-            write_data( "PQRST", 0 );
-            write_data( "UVWXY", 0 );
-            write_data( "Zabcd", 0 );
-            
-            
-            set_outready_cnt(1);
-            write_data( "efghi", 1 );
-            write_data( "jklmo", 1 );
-            set_outready_cnt(4);
-
-            #100;
-
-            write_data( "ABCDE", 0 );
-            write_data( "FGHIJ", 0 );
-            write_data( "KLMON", 1 ); // pause>0 is need before delay
-
-            #100;
-
-            write_data( "PQRST", 0 );
-            write_data( "UVWXY", 0 );
-            write_data( "Zabcd", 1 ); // pause>0 is need before delay
-
-            #500;
-
-            test_done=1;        
     end
 
-    1: begin
-        // some action for test_id==1
-            #500;
-            @(posedge clk);
-            fork 
-              write_seq();
-              gen_out_tready();
-            join
-            #500;        
-    end
+    $display("chip-expo-2021-template-3-axi_stream  test_id=%d  name:", test_id, test_name[test_id] );
+    
+    reset_n = '0;
 
-  endcase
+    #100;
 
-  @(posedge clk iff test_done=='1 || test_timeout=='1);
+    reset_n = '1;
 
-  if( test_timeout )
-    cnt_error++;
+    repeat (100) @(posedge clk );
+
+    test_start <= #1 '1;
+
+
+    @(posedge clk iff test_done=='1 || test_timeout=='1);
+
+    if( test_timeout )
+        cnt_error++;
 
     $display( "cnt_wr: %d", cnt_wr );
     $display( "cnt_rd: %d", cnt_rd );
@@ -197,14 +147,73 @@ initial begin
     $display("coverage of covergroup cg.i_vld_rdy  = %0f", uut.dut.cg.i_vld_rdy.get_coverage());
     $display("coverage of covergroup cg.o_vld_rdy  = %0f", uut.dut.cg.o_vld_rdy.get_coverage());
 
-  if( 0==cnt_error && cnt_ok>0 )
-    test_finish( test_id, test_name[test_id], 1 );
-  else
-    test_finish( test_id, test_name[test_id], 0 );
+    if( 0==cnt_error && cnt_ok>0 )
+        test_finish( test_id, test_name[test_id], 1 );
+    else
+        test_finish( test_id, test_name[test_id], 0 );
 
 end
   
 always @(posedge clk ) cv_all = $get_coverage();
+
+// Generate test sequence 
+initial begin
+
+    @(posedge clk iff test_start=='1);
+        
+    case( test_id )
+        0: begin
+            // some action for test_id==0
+
+                #500;
+                @(posedge clk);
+                write_data( "ABCDE", 0 );
+
+                write_data( "FGHIJ", 2 );
+
+
+                write_data( "KLMON", 0 );
+                set_outready_cnt(4);
+                write_data( "PQRST", 0 );
+                write_data( "UVWXY", 0 );
+                write_data( "Zabcd", 0 );
+                
+                
+                set_outready_cnt(1);
+                write_data( "efghi", 1 );
+                write_data( "jklmo", 1 );
+                set_outready_cnt(4);
+
+                #100;
+
+                write_data( "ABCDE", 0 );
+                write_data( "FGHIJ", 0 );
+                write_data( "KLMON", 1 ); // pause>0 is need before delay
+
+                #100;
+
+                write_data( "PQRST", 0 );
+                write_data( "UVWXY", 0 );
+                write_data( "Zabcd", 1 ); // pause>0 is need before delay
+
+                #500;
+
+                test_done=1;        
+        end
+
+        1: begin
+            // some action for test_id==1
+                #500;
+                @(posedge clk);
+                fork 
+                write_seq();
+                gen_out_tready();
+                join
+                #500;        
+        end
+
+    endcase
+end
 
 // Monitor
 always @(posedge clk)
@@ -318,7 +327,7 @@ begin
         write_data( val, pause );
         end 
         if( 100==$get_coverage())
-        break;
+            break;
     end
 
     write_data( 0, 1 );

@@ -1,1 +1,0 @@
- ./compile.sh && ./elaborate_1.sh && ./c_run.sh && ./cvr.sh 

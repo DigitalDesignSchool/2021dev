@@ -1,1 +1,0 @@
-xsim -gui tb_behav --view ./wave.wcfg 

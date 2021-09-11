@@ -21,7 +21,10 @@ task test_finish;
   		input int		result;
 begin
   automatic int fd = $fopen( "global.txt", "a" );
-  
+
+  $display("");
+  $display("");
+
   if( 1==result ) begin
     $fdisplay( fd, "test_id=%-5d test_name: %15s         TEST_PASSED", test_id, test_name );
     $display( "test_id=%-5d test_name: %15s         TEST_PASSED", test_id, test_name );
@@ -30,6 +33,11 @@ begin
     $display( "test_id=%-5d test_name: %15s         TEST_FAILED *******", test_id, test_name );
   end
   
+  $fclose( fd );
+
+  $display("");
+  $display("");
+
   $stop();
 end endtask  
   
@@ -182,7 +190,7 @@ task write_data;
     @(posedge aclk iff in_tvalid & in_tready);
     cnt_wr++;
     if( cnt_wr<16 ) begin
-    $display( "input: %s  (%h) ", data, data, );
+    $display( "input: %h ", data, );
     end
 
     if( pause>0 ) begin
@@ -210,6 +218,7 @@ begin
 
       write_data( val, pause );
     end 
+    write_data( 8'h0F, 1 );
   //   if( 100==$get_coverage())
   //     break;
   // end
@@ -267,11 +276,11 @@ always @(posedge aclk)
       cnt_ok++;
 
       if( cnt_ok<16 )
-        $display( "output: %s  (%h)  ok: %-5d error: %-5d  - Ok", out_tdata, out_tdata, cnt_ok, cnt_error );
+        $display( "output: %h  ok: %-5d error: %-5d  - Ok", out_tdata, cnt_ok, cnt_error );
     end else begin
       cnt_error++;
       if( cnt_error<16 )
-        $display( "output: %s  (%h)  expect %s (%h) ok: %-5d error: %-5d  - Error", out_tdata, out_tdata, expect_tdata, expect_tdata, cnt_ok, cnt_error );
+        $display( "output: %h  expect %h ok: %-5d error: %-5d  - Error", out_tdata, expect_tdata, cnt_ok, cnt_error );
 
     end
 
@@ -352,7 +361,7 @@ initial begin
           begin
               write_seq( 500, 8);
               #500;
-              write_seq( 200, 1000);
+              write_seq( 200, 400);
               #500;
               write_seq( 100, 5000);
               #500;
@@ -369,7 +378,7 @@ initial begin
 end 
 
 initial begin
-    #4000000;
+    #80000000;
     $display( "Timeout");
     test_timeout = '1;
 end

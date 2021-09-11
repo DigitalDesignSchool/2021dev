@@ -25,10 +25,12 @@ task test_finish;
   		input string	test_name;
   		input int		result;
 begin
+
+    automatic int fd = $fopen( "global.txt", "a" );
+
     $display("");
     $display("");
 
-    automatic int fd = $fopen( "global.txt", "a" );
     if( 1==result ) begin
         $fdisplay( fd, "test_id=%-5d test_name: %15s         TEST_PASSED", 
         test_id, test_name );
@@ -41,6 +43,8 @@ begin
         test_id, test_name );
     end
 
+    $fclose( fd );
+
     $display("");
     $display("");
 
@@ -48,11 +52,7 @@ begin
 end endtask  
   
 // Install component   
-generate
-    if( test_id<10) begin
-            user    uut();
-    end
-endgenerate
+user    uut();
 
 // Main process  
 initial begin  

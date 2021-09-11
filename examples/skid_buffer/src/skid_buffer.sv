@@ -15,7 +15,7 @@ module skid_buffer
 
   output reg [nb - 1:0]   out_tdata,
   output reg              out_tvalid,
-  input  reg              out_tready
+  input  wire             out_tready
 );
 
 

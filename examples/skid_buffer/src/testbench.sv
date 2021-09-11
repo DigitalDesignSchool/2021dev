@@ -17,17 +17,25 @@ task test_finish;
   		input string	test_name;
   		input int		result;
 begin
-  automatic int fd = $fopen( "global.txt", "a" );
-  
-  if( 1==result ) begin
-    $fdisplay( fd, "test_id=%-5d test_name: %15s         TEST_PASSED", test_id, test_name );
-    $display( "test_id=%-5d test_name: %15s         TEST_PASSED", test_id, test_name );
-  end else begin
-    $fdisplay( fd, "test_id=%-5d test_name: %15s         TEST_FAILED *******", test_id, test_name );
-    $display( "test_id=%-5d test_name: %15s         TEST_FAILED *******", test_id, test_name );
-  end
-  
-  $stop();
+    automatic int fd = $fopen( "global.txt", "a" );
+
+    $display("");
+    $display("");
+
+    if( 1==result ) begin
+        $fdisplay( fd, "test_id=%-5d test_name: %15s         TEST_PASSED", test_id, test_name );
+        $display(      "test_id=%-5d test_name: %15s         TEST_PASSED", test_id, test_name );
+    end else begin
+        $fdisplay( fd, "test_id=%-5d test_name: %15s         TEST_FAILED *******", test_id, test_name );
+        $display(      "test_id=%-5d test_name: %15s         TEST_FAILED *******", test_id, test_name );
+    end
+
+    $fclose( fd );
+
+    $display("");
+    $display("");
+
+    $stop();
 end endtask  
   
 localparam  n = 4, nb = n * 8;
@@ -245,7 +253,7 @@ initial begin
 //   $fscanf( fd,"%d\n",test_id);
 //   $fclose(fd );
 
-  int args=-1;
+  automatic int args=-1;
    
   if( $value$plusargs( "test_id=%0d", args )) begin
     if( args>=0 && args<2 )

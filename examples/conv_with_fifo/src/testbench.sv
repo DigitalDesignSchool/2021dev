@@ -18,7 +18,10 @@ task test_finish;
   		input int		result;
 begin
     automatic int fd = $fopen( "global.txt", "a" );
-    
+
+    $display("");
+    $display("");
+
     if( 1==result ) begin
         $fdisplay( fd, "test_id=%-5d test_name: %15s         TEST_PASSED", test_id, test_name );
         $display( "test_id=%-5d test_name: %15s         TEST_PASSED", test_id, test_name );
@@ -26,7 +29,9 @@ begin
         $fdisplay( fd, "test_id=%-5d test_name: %15s         TEST_FAILED *******", test_id, test_name );
         $display( "test_id=%-5d test_name: %15s         TEST_FAILED *******", test_id, test_name );
     end
-  
+
+    $fclose( fd );
+
     $display("");
     $display("");
 

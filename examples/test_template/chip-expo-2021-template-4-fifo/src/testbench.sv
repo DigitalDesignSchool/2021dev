@@ -35,16 +35,18 @@ begin
     $display("");
 
     if( 1==result ) begin
-        $fdisplay( fd, "test_id=%-5d test_name: %15s         TEST_PASSED", 
+        $fdisplay( fd, "test_id=%-5d test_name: %25s         TEST_PASSED", 
         test_id, test_name );
-        $display(      "test_id=%-5d test_name: %15s         TEST_PASSED", 
+        $display(      "test_id=%-5d test_name: %25s         TEST_PASSED", 
         test_id, test_name );
     end else begin
-        $fdisplay( fd, "test_id=%-5d test_name: %15s         TEST_FAILED *******", 
+        $fdisplay( fd, "test_id=%-5d test_name: %25s         TEST_FAILED *******", 
         test_id, test_name );
-        $display(      "test_id=%-5d test_name: %15s         TEST_FAILED *******", 
+        $display(      "test_id=%-5d test_name: %25s         TEST_FAILED *******", 
         test_id, test_name );
     end
+
+    $fclose( fd );
 
     $display("");
     $display("");

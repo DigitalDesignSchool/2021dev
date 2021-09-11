@@ -42,6 +42,8 @@ begin
         test_id, test_name );
     end
 
+    $fclose( fd );
+    
     $display("");
     $display("");
 

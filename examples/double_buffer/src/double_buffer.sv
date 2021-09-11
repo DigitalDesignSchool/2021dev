@@ -16,7 +16,7 @@ module double_buffer
 
   output reg [bits - 1:0]   downstream_data,
   output reg                downstream_valid,
-  input  reg                downstream_ready
+  input  wire               downstream_ready
 );
   
 logic [bits-1:0]     data_a;

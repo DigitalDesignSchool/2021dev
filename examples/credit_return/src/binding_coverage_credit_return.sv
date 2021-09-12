@@ -2,6 +2,8 @@
 
 `default_nettype none 
 
+`include "defines.svh"
+
 module  binding_coverage_credit_return
   (
     input wire aclk,
@@ -27,7 +29,7 @@ logic [3:0] size;
 assign size = rd_a_data[11:8];
   
   
-  `ifdef COVERAGE
+`ifdef COVERAGE
 
 //   wire [3:0] all_cases
 //       = { in_tvalid, lower_bits, out_tvalid, out_tready };
@@ -85,13 +87,13 @@ assign size = rd_a_data[11:8];
       
 	cvr cg = new ();
       
-	`endif
   
     logic [15:0] ccc;
       
  always @ (posedge aclk)
    ccc <= cg.o_rdy_transitions.get_coverage ();
 
+`endif
       
   
 endmodule

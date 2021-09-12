@@ -1,5 +1,8 @@
 `timescale 1 ns / 1 ns
 `default_nettype none
+
+`include "defines.svh"
+
 /**
     ram_a содержит адрес и размер пакета который находится в памяти ram_b
     [15:8] - размер
@@ -89,7 +92,7 @@ logic               wr_b_valid=0;
 
 initial begin
   $dumpfile("dump.vcd");
-  $dumpvars(1);
+  $dumpvars(2);
 end
 always #5 aclk = ~aclk;
 
@@ -361,7 +364,7 @@ initial begin
           begin
               write_seq( 500, 8);
               #500;
-              write_seq( 200, 400);
+              write_seq( 200, 1000);
               #500;
               write_seq( 100, 5000);
               #500;

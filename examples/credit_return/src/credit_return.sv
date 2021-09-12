@@ -2,6 +2,9 @@
 `timescale 1 ns / 1 ns
 `default_nettype none 
 
+`include "defines.svh"
+
+
 module credit_return
 (
   input  wire               aclk,
@@ -80,7 +83,7 @@ end
 
 always_ff @(posedge aclk)
     if( rstp )
-        crd_cnt <= #1 7'b1101000;
+        crd_cnt <= #1 7'b1000000;
     else
         crd_cnt <= #1 n_crd_cnt;
 
@@ -94,9 +97,6 @@ end
 
 
 fifo_256
-#(
-    .DEPTH              (   16  )
-)    
 fifo
 (
     .reset_p            (   rstp    ),    //! 1 - reset

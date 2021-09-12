@@ -90,7 +90,7 @@ real                calc_velocity;
 
 initial begin
   $dumpfile("dump.vcd");
-  $dumpvars(1);
+  $dumpvars(2);
 end
 always #5 aclk = ~aclk;
 

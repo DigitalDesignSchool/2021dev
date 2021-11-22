@@ -7,23 +7,23 @@ module pseudo_dual_port_memory
   #(
     parameter  DATA_WIDTH = 32,
     parameter  ADDR_WIDTH = 4,
-    parameter  DATA_LAT   = 2,		   		    // Delay in cycles between data request and data output 
-    localparam ADDR_MAX   = {ADDR_WIDTH{1'b1}} 	// 2 ^ ADDR_WIDTH -1
+    parameter  DATA_LAT   = 2,                 // Delay in cycles between data request and data output 
+    localparam ADDR_MAX   = {ADDR_WIDTH{1'b1}} // 2 ^ ADDR_WIDTH -1
   )(
     input wire clk,
     input wire rst,
 
     // Read port 
     input wire [ADDR_WIDTH-1:0]  r_addr,
-    input wire      		 	 r_avalid,
+    input wire                   r_avalid,
 
-    output wire				     r_dvalid,
+    output wire                  r_dvalid,
     output wire [DATA_WIDTH-1:0] r_data,
     
     // Write port 
     input wire [ADDR_WIDTH-1:0]  w_addr,
     input wire [DATA_WIDTH-1:0]  w_data,
-    input wire				     w_valid
+    input wire                   w_valid
   );
 
   // Memory as multi-dimensional array
@@ -35,7 +35,7 @@ module pseudo_dual_port_memory
       memory[w_addr] <= #1 w_data;
 
   // Read data from memory with latency
-  reg 			       r_dvalid_shift [DATA_LAT-1:0];
+  reg                  r_dvalid_shift [DATA_LAT-1:0];
   reg [DATA_WIDTH-1:0] r_data_shift   [DATA_LAT-1:0];
 
   always @(posedge clk) begin

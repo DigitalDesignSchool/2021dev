@@ -66,6 +66,24 @@ set_location_assignment PIN_137 -to nx_digit[3]
 set_location_assignment PIN_136 -to nx_digit[2]
 set_location_assignment PIN_135 -to nx_digit[1]
 set_location_assignment PIN_23 -to clock
+
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to abcdefgh[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to abcdefgh[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to abcdefgh[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to abcdefgh[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to abcdefgh[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to abcdefgh[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to abcdefgh[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to abcdefgh[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clock
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to nx_digit[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to nx_digit[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to nx_digit[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to nx_digit[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to reset_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to tx
+
 set_global_assignment -name VERILOG_INCLUDE_FILE ../common/Calculator/defines.vh
 set_global_assignment -name VERILOG_FILE ../common/Calculator/stack.v
 set_global_assignment -name VERILOG_FILE ../common/Calculator/calculator.v

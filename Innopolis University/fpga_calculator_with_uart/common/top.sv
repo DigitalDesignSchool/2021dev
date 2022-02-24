@@ -62,7 +62,7 @@ module top (
   wire [15:0] result;
   wire overflow, newresult;
   wire [3:0] error_calculator;
-
+  wire is_tx_busy;
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   calculator calculator (
@@ -95,7 +95,8 @@ module top (
       .start(newresult),
       .data (result),
 
-      .q(tx)
+      .q(tx),
+      .busy(is_tx_busy)
   );
 
 

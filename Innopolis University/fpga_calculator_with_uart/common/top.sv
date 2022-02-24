@@ -12,7 +12,7 @@ module top (
   wire byte_ready;
   wire [7:0] ascii_data;
 
-  mfp_uart_receiver listener (
+  uart_receiver listener (
       .clock     (clock),
       .reset_n   (reset_n),
       .rx        (rx),
@@ -78,7 +78,6 @@ module top (
       .overflow (overflow),
       .error    (error_calculator)
   );
-
 
   seven_segment_4_digits display (
       .clock (clock),

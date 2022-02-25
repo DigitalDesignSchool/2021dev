@@ -4,7 +4,8 @@ module two_bytes_uart_tx (
     input        reset,
     input [15:0] data,
 
-    output reg q
+    output reg q,
+    output     busy
 );
 
   reg [12:0] cnt;
@@ -12,6 +13,7 @@ module two_bytes_uart_tx (
 
   wire bit_start = (cnt == 5208);
   wire idle = (bit_num == 4'hF);
+  assign busy = ~idle;
 
   reg byte_state;
   wire [7:0] word = byte_state ? data[7:0] : data[15:8];

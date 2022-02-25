@@ -12,7 +12,7 @@ module top (
   wire byte_ready;
   wire [7:0] ascii_data;
 
-  mfp_uart_receiver listener (
+  uart_receiver listener (
       .clock     (clock),
       .reset_n   (reset_n),
       .rx        (rx),
@@ -62,7 +62,7 @@ module top (
   wire [15:0] result;
   wire overflow, newresult;
   wire [3:0] error_calculator;
-
+  wire is_tx_busy;
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   calculator calculator (
@@ -79,7 +79,6 @@ module top (
       .error    (error_calculator)
   );
 
-
   seven_segment_4_digits display (
       .clock (clock),
       .reset (~reset_n),
@@ -95,7 +94,8 @@ module top (
       .start(newresult),
       .data (result),
 
-      .q(tx)
+      .q(tx),
+      .busy(is_tx_busy)
   );
 
 

@@ -14,32 +14,32 @@ module multimemory
     localparam ADDR_MAX   = {ADDR_WIDTH{1'b1}}, 	// 2 ^ ADDR_WIDTH -1
     localparam DATA_LAT   = 2 //( >1 ) delay in cycles between data request and data output 
 )(
-    input clk,
-    input rst,
+    input wire clk,
+    input wire rst,
 
     // read ports
-    input  [REQUESTERS-1:0][ADDR_WIDTH-1:0] r_addr,
-    input  [REQUESTERS-1:0]				r_avalid,
+    input wire [REQUESTERS-1:0][ADDR_WIDTH-1:0]  r_addr,
+    input wire [REQUESTERS-1:0]			 r_avalid,
     
-    output [REQUESTERS-1:0]     		r_dvalid,
-    output [REQUESTERS-1:0][DATA_WIDTH-1:0] r_data,
-    output [REQUESTERS-1:0]				r_aready,
+    output wire [REQUESTERS-1:0]     		 r_dvalid,
+    output wire [REQUESTERS-1:0][DATA_WIDTH-1:0] r_data,
+    output wire [REQUESTERS-1:0]		 r_aready,
     
     // write ports
-    input  [REQUESTERS-1:0][ADDR_WIDTH-1:0] w_addr,
-    input  [REQUESTERS-1:0][DATA_WIDTH-1:0] w_data,
-    input  [REQUESTERS-1:0]  			w_valid,
+    input wire [REQUESTERS-1:0][ADDR_WIDTH-1:0]  w_addr,
+    input wire [REQUESTERS-1:0][DATA_WIDTH-1:0]  w_data,
+    input wire [REQUESTERS-1:0]  		 w_valid,
     
-    output [REQUESTERS-1:0]				w_ready
+    output wire [REQUESTERS-1:0]		 w_ready
   );
 
   reg  [ADDR_WIDTH-1:0] mem_r_addr;
-  reg       	    mem_r_avalid;
-  wire			    mem_r_dvalid;  // not used
+  reg       		mem_r_avalid;
+  wire			mem_r_dvalid;  // not used
   wire [DATA_WIDTH-1:0] mem_r_data;
   reg  [ADDR_WIDTH-1:0] mem_w_addr;
   reg  [DATA_WIDTH-1:0] mem_w_data;
-  reg				mem_w_valid;
+  reg			mem_w_valid;
   
   // memory
   pseudo_dual_port_memory #(DATA_WIDTH, ADDR_WIDTH, DATA_LAT-1) memory (
@@ -56,124 +56,58 @@ module multimemory
   // read arbiter
   wire [REQUESTERS-1:0] r_grant;
   arbiter #(REQUESTERS) r_arbiter (
-    .req(r_avalid),
+    .req(r_avalid & ~r_aready),
     .grant(r_grant),
-	.*
+    .*
   );
 
   // write arbiter
   wire [REQUESTERS-1:0] w_grant;
   arbiter #(REQUESTERS) w_arbiter (
-    .req(w_valid),
+    .req(w_valid & ~w_ready),
     .grant(w_grant),
-	.*
+    .*
   );
   
   // Read data from memory with latency
-  reg [REQUESTERS-1:0] r_dvalid_shift [DATA_LAT];
+  reg [REQUESTERS-1:0] r_dvalid_shift [DATA_LAT-1:0];
   reg [REQUESTERS-1:0] sync_r_aready;
   reg [REQUESTERS-1:0] sync_w_ready;
 
-  // always @(posedge clk) begin
+  always @(posedge clk) begin
+    mem_r_avalid <= #1 0;
+    mem_w_valid  <= #1 0;
 
-  //   mem_r_addr  <= #1 '0;
-  //   mem_r_avalid <= #1 '0;
-  //   // mem_w_addr  <= #1 '0;
-  //   // mem_w_data  <= #1 '0;
-  //   // mem_w_valid <= #1 '0;
+    if (rst)
+      r_dvalid_shift <= #1 '{DATA_LAT{0}};
+    else begin
+      sync_r_aready <= #1 r_grant;
+      sync_w_ready  <= #1 w_grant;
 
-  //   if (rst) begin
-  //     mem_r_addr  <= #1 '0;
-  //     mem_r_avalid <= #1 '0;
-  //     // mem_w_addr  <= #1 '0;
-  //     // mem_w_data  <= #1 '0;
-  //     // mem_w_valid <= #1 '0;
-
-  //   end else begin
-
-  //     // Put
-  //     for (int r = 0; r < REQUESTERS; r++) begin
-
-  //       if(r_aready[r]=='1 && r_avalid[r]=='1 ) begin
-  //         mem_r_addr  <= #1 r_addr[r];
-  //         mem_r_avalid <= #1 '1;
-  //         r_dvalid_shift[0][r] <= #1 '1;
-  //       end else begin
-  //         r_dvalid_shift[0][r] <= #1 '0;
-  //       end
-
-  //       // if(w_ready[r]=='1 && w_valid[r]=='1 )  begin
-  //       //   mem_w_addr  <= #1 w_addr[r];
-  //       //   mem_w_data  <= #1 w_data[r];
-  //       //   mem_w_valid <= #1 '1;
-  //       // end 
-  //     end
-
-  //     // Shift
-  //     if (rst) begin
-  //       r_dvalid_shift <= #1 '{DATA_LAT{0}};
-  //     end else begin
-  //       for (int i = 1; i < DATA_LAT; i++)
-  //         r_dvalid_shift[i] <= #1 r_dvalid_shift[i - 1];
-  //     end
-  //   end
-  // end
-
-  logic  [ADDR_WIDTH-1:0]         n_r_addr;
-  logic                           n_mem_r_avalid;
-  logic   [REQUESTERS-1:0]        n_r_dvalid_shift;
-  always_comb begin
-
-    n_r_addr = '0;
-    n_mem_r_avalid = '0;
-    n_r_dvalid_shift = '0;
-
-    for( int ii=0; ii<REQUESTERS; ii++ ) begin
-        if( r_aready[ii]=='1 && r_avalid[ii]=='1  ) begin
-            n_r_addr        = r_addr[ii];
-            n_mem_r_avalid  = '1;
-            n_r_dvalid_shift[ii] = '1;
+      r_dvalid_shift[0] <= #1 r_grant;
+      // Put
+      for (int r = 0; r < REQUESTERS; r++) begin
+        if(r_grant[r]) begin
+          mem_r_addr   <= #1 r_addr[r];
+          mem_r_avalid <= #1 1;
         end
+        if(w_grant[r]) begin
+          mem_w_addr  <= #1 w_addr[r];
+          mem_w_data  <= #1 w_data[r];
+          mem_w_valid <= #1 1;
+        end
+      end
+
+      // Shift
+      for (int i = 1; i < DATA_LAT; i++)
+        r_dvalid_shift[i] <= #1 r_dvalid_shift[i - 1];
     end
   end
-
-  always @(posedge clk) begin
-    // Shift
-      if (rst) begin
-        r_dvalid_shift <= #1 '{DATA_LAT{0}};
-      end else begin
-        for (int i = 1; i < DATA_LAT; i++)
-          r_dvalid_shift[i] <= #1 r_dvalid_shift[i - 1];
-
-        r_dvalid_shift[0] <= n_r_dvalid_shift;
-
-        mem_r_addr  <=  #1  n_r_addr;
-        mem_r_avalid <= #1  n_mem_r_avalid;
-
-      end
   
-  end
-  
-  assign r_aready = r_grant;
-  assign w_ready  = w_grant;
+  assign r_aready = sync_r_aready;
+  assign w_ready  = sync_w_ready;
   assign r_dvalid = r_dvalid_shift[DATA_LAT-1];
   
-  always_comb begin
-
-    mem_w_addr  <= '0;
-    mem_w_data  <= '0;
-    mem_w_valid <= '0;
-
-    for( int ii=0; ii<REQUESTERS; ii++ ) begin
-      if( 1==w_grant[ii] ) begin
-          mem_w_addr  <= w_addr[ii];
-          mem_w_data  <= w_data[ii];
-          mem_w_valid <= w_valid[ii];
-          break;
-      end
-    end
-
-  end
   // connect all requesters to the data wire
   genvar i; generate
     for (i=0; i<REQUESTERS; i=i+1)

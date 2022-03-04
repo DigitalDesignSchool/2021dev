@@ -28,6 +28,8 @@
     ``` text
     Boundrate: 9600
     Data bits: 8
+    Stop bits: 2
+    Parity: none
     ```
 
     *Остальные по умалчанию*
@@ -46,7 +48,9 @@
 
 # Инструкция UART для Windows
 
-1. Установить программу Terminal из
+1. Скачать и запустить программу **Terminal**:
+
+    `DigitalDesignSchool/.../fpga_calculator_with_uart/programs.Terminal1_9_b.zip`
 
     >[ссылка](https://github.com/DigitalDesignSchool/2021dev/tree/main/Innopolis%20University/fpga_calculator_with_uart/programs "Terminal")
 
@@ -55,6 +59,8 @@
     ![windows_COM](.pictures/windows_COM.png)
 
     Если же ОС не определила его, то необходимо установить драйвер для микросхемы CH340 из:
+
+    `DigitalDesignSchool/.../fpga_calculator_with_uart/programs.ch340.zip`
 
     >[ссылка](https://github.com/DigitalDesignSchool/2021dev/tree/main/Innopolis%20University/fpga_calculator_with_uart/programs "CH340")
 
@@ -66,10 +72,15 @@
     Boundrate: 9600
     Data bits: 8
     Parity: none
+    Stop bits: 2
     Send: +CR
     ```
 
     *Остальные по умалчанию*
+
+4. Установить флаг **Hex** для приёма.
+
+5. Нажать на кнопку **Connect**  для открытия канала связи.
 
 ![Terminal](.pictures/Terminal.png)
 

@@ -33,9 +33,41 @@
     *Остальные по умалчанию*
 
 4. Выбрать нужное устройство (**Device**)
-5. В поле **Input** выбрать **CR** (После отправки идёт бит с возвратом каретки). 
+5. В поле **Input** выбрать **CR** (После отправки идёт бит с возвратом каретки).
 6. В самом низу окна установить флаг **Hex output**
 7. Нажать на кнопку **Open**  для открытия канала связи.
 
 ![CuteCome](.pictures/CuteCome.png)
+
+---
+
+# Инструкция UART для Windows
+
+1. Установить программу Terminal из
+
+    `https://github.com/DigitalDesignSchool/2021dev/tree/main/Innopolis%20University/fpga_calculator_with_uart/programs`
+
+2. Подключить кабель в USB разъем пк/ноутбука и посмотреть в диспетчере устройств определился ли виртуальный ComPort подлюченного преобразователя.
+
+    ![windows_COM](.pictures/windows_COM.png)
+
+    Если же ОС не определила его, то необходимо установить драйвер для микросхемы CH340 из:
+
+    `https://github.com/DigitalDesignSchool/2021dev/tree/main/Innopolis%20University/fpga_calculator_with_uart/programs`
+
+    После чего, виртуальный ComPort должен определиться в ОС.
+
+3. Запускаем Terminal, устанавливаем в нём номер COM (в нашем случае 9) и другиие настройки:
+
+    ``` text
+    Boundrate: 9600
+    Data bits: 8
+    Parity: none
+    Send: +CR
+    ```
+
+    *Остальные по умалчанию*
+
+![Terminal](.pictures/Terminal.png)
+
 ---

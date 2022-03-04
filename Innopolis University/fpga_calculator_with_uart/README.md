@@ -45,7 +45,7 @@
 
 1. Установить программу Terminal из
 
-    `https://github.com/DigitalDesignSchool/2021dev/tree/main/Innopolis%20University/fpga_calculator_with_uart/programs`
+    >[ссылка](https://github.com/DigitalDesignSchool/2021dev/tree/main/Innopolis%20University/fpga_calculator_with_uart/programs "Terminal")
 
 2. Подключить кабель в USB разъем пк/ноутбука и посмотреть в диспетчере устройств определился ли виртуальный ComPort подлюченного преобразователя.
 
@@ -53,7 +53,7 @@
 
     Если же ОС не определила его, то необходимо установить драйвер для микросхемы CH340 из:
 
-    `https://github.com/DigitalDesignSchool/2021dev/tree/main/Innopolis%20University/fpga_calculator_with_uart/programs`
+    >[ссылка](https://github.com/DigitalDesignSchool/2021dev/tree/main/Innopolis%20University/fpga_calculator_with_uart/programs "CH340")
 
     После чего, виртуальный ComPort должен определиться в ОС.
 

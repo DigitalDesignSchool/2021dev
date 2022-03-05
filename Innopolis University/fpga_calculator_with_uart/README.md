@@ -50,9 +50,9 @@
 
 1. Скачать и запустить программу **Terminal**:
 
-    `DigitalDesignSchool/.../fpga_calculator_with_uart/programs.Terminal1_9_b.zip`
+    `https://github.com/DigitalDesignSchool/ce2020labs/tree/master/day_8/terminal_win.Terminal1_9_b.zip`
 
-    >[ссылка](https://github.com/DigitalDesignSchool/2021dev/tree/main/Innopolis%20University/fpga_calculator_with_uart/programs "Terminal")
+    >[ссылка](https://github.com/DigitalDesignSchool/ce2020labs/tree/master/day_8 "Terminal")
 
 2. Подключить кабель в USB разъем пк/ноутбука и посмотреть в диспетчере устройств определился ли виртуальный ComPort подлюченного преобразователя.
 
@@ -60,9 +60,9 @@
 
     Если же ОС не определила его, то необходимо установить драйвер для микросхемы CH340 из:
 
-    `DigitalDesignSchool/.../fpga_calculator_with_uart/programs.ch340.zip`
+    `https://github.com/DigitalDesignSchool/ce2020labs/tree/master/day_8/usb_uart_driver.ch340.zip`
 
-    >[ссылка](https://github.com/DigitalDesignSchool/2021dev/tree/main/Innopolis%20University/fpga_calculator_with_uart/programs "CH340")
+    >[ссылка](https://github.com/DigitalDesignSchool/ce2020labs/tree/master/day_8/ "CH340")
 
     После чего, виртуальный ComPort должен определиться в ОС.
 

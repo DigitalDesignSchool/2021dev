@@ -1,0 +1,13 @@
+*~
+*.bak
+*.swp
+*.swo
+*.qdf
+*.qws
+# *.qpf
+# *.qsf
+# /.*
+
+**/db/
+**/output_files/
+**/incremental_db/

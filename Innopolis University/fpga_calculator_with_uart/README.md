@@ -28,14 +28,60 @@
     ``` text
     Boundrate: 9600
     Data bits: 8
+    Stop bits: 2
+    Parity: none
     ```
 
     *Остальные по умалчанию*
 
 4. Выбрать нужное устройство (**Device**)
-5. В поле **Input** выбрать **CR** (После отправки идёт бит с возвратом каретки). 
+
+5. В поле **Input** выбрать **CR** (После отправки идёт бит с возвратом каретки).
+
 6. В самом низу окна установить флаг **Hex output**
+
 7. Нажать на кнопку **Open**  для открытия канала связи.
 
 ![CuteCome](.pictures/CuteCome.png)
+
+---
+
+# Инструкция UART для Windows
+
+1. Скачать и запустить программу **Terminal**:
+
+    `https://github.com/DigitalDesignSchool/ce2020labs/tree/master/day_8/terminal_win.Terminal1_9_b.zip`
+
+    >[ссылка](https://github.com/DigitalDesignSchool/ce2020labs/tree/master/day_8 "Terminal")
+
+2. Подключить кабель в USB разъем пк/ноутбука и посмотреть в диспетчере устройств определился ли виртуальный ComPort подлюченного преобразователя.
+
+    ![windows_COM](.pictures/windows_COM.png)
+
+    Если же ОС не определила его, то необходимо установить драйвер для микросхемы CH340 из:
+
+    `https://github.com/DigitalDesignSchool/ce2020labs/tree/master/day_8/usb_uart_driver.ch340.zip`
+
+    >[ссылка](https://github.com/DigitalDesignSchool/ce2020labs/tree/master/day_8/ "CH340")
+
+    После чего, виртуальный ComPort должен определиться в ОС.
+
+3. Запускаем Terminal, устанавливаем в нём номер COM (в нашем случае 9) и другиие настройки:
+
+    ``` text
+    Boundrate: 9600
+    Data bits: 8
+    Parity: none
+    Stop bits: 2
+    Send: +CR
+    ```
+
+    *Остальные по умалчанию*
+
+4. Установить флаг **Hex** для приёма.
+
+5. Нажать на кнопку **Connect**  для открытия канала связи.
+
+![Terminal](.pictures/Terminal.png)
+
 ---

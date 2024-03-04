@@ -1,4 +1,4 @@
-module two_bytes_uart_tx (
+module uart_transmitter (
     input        clock,
     input        start,
     input        reset,
@@ -8,10 +8,14 @@ module two_bytes_uart_tx (
     output     busy
 );
 
+  parameter clock_frequency = 50000000;
+  parameter baud_rate       = 9600;
+  parameter clock_cycles_in_bit = clock_frequency / baud_rate;
+  
   reg [12:0] cnt;
   reg [3:0]  bit_num;
 
-  wire bit_start = (cnt == 5208);
+  wire bit_start = (cnt == clock_cycles_in_bit);
   wire idle = (bit_num == 4'hF);
   assign busy = ~idle;
 
@@ -27,7 +31,7 @@ module two_bytes_uart_tx (
 
   always @(posedge clock) begin
     if (reset) begin
-      bit_num    <= 4'hf;
+      bit_num    <= 4'hF;
       byte_state <= 1'b0;
       q <= 1'b1;
     end else if (start && idle) begin
